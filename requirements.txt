@@ -1,0 +1,9 @@
+connexion
+connexion[swagger-ui]
+python_dateutil
+setuptools
+swagger-ui-bundle
+requests
+hiyapyco
+pyjwt[crypto]
+py-healthcheck
