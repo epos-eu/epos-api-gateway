@@ -52,4 +52,3 @@ release_tag:
     - git config user.email "${GITLAB_USER_EMAIL}"
     - git config user.name "${GITLAB_USER_NAME}"
     - bash ./autotag.sh
-  
