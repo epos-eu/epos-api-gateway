@@ -12,6 +12,8 @@ import traceback
 import requests
 
 from swagger_server.controllers import routing_request
+from connexion.decorators.response import ResponseValidator
+from swagger_server.custom_validators import CustomParameterValidator, CustomRequestBodyValidator
 
 import os
 
@@ -281,12 +283,17 @@ def processing_health():
     return (json.loads(resp.text), resp.status_code, headers)
 
 def main():
+    validator_map = {
+    'parameter': CustomParameterValidator,
+    'body': CustomRequestBodyValidator,
+    'response': ResponseValidator,
+}
 
     load_configuration()
 
     app = connexion.App(__name__, specification_dir='./swagger_generated/')
     app.app.json_encoder = encoder.JSONEncoder
-    app.add_api('swagger_built.yaml', arguments={'title': 'API Gateway'}, pythonic_params=True)
+    app.add_api('swagger_built.yaml', arguments={'title': 'API Gateway'},validator_map=validator_map, pythonic_params=True)
     flask_app = app.app
     app.add_url_rule("/api/v1/resources-service/health", "resources_health", resources_health)
     app.add_url_rule("/api/v1/ingestor-service/health", "ingestor_health", ingestor_health)
