@@ -219,6 +219,15 @@ def load_configuration():
         except:
             logging.error("Error executing fetch of processing host")
             traceback.print_exc()
+    if os.getenv('LOAD_EMAIL_SENDER_API') == "true" :
+        try:
+            item = urllib.request.urlopen(routing_request.EMAIL_SENDER_HOST+os.getenv('BASECONTEXT')+routing_request.EMAIL_SENDER_SERVICE+"/api-docs")
+            json_loaded = json.loads(item.read())
+            manipulate_and_generate_yaml(json_loaded, r'./swagger_server/swagger_downloaded/sender.yaml',routing_request.EMAIL_SENDER_SERVICE, routing_request.EMAIL_SENDER_HOST, os.getenv('IS_AAI_ENABLED') == 'true')
+            conf_array.append(open("./swagger_server/swagger_downloaded/sender.yaml", "r", encoding="utf-8").read())
+        except:
+            logging.error("Error executing fetch of processing host")
+            traceback.print_exc()
 
 
     # ADD Security component
@@ -282,6 +291,13 @@ def processing_health():
 
     return (json.loads(resp.text), resp.status_code, headers)
 
+def email_sender_health():
+    resp = requests.get(routing_request.EMAIL_SENDER_HOST+os.getenv('BASECONTEXT')+routing_request.EMAIL_SENDER_SERVICE+"/actuator/health", allow_redirects=False)
+    excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
+    headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
+
+    return (json.loads(resp.text), resp.status_code, headers)
+
 def main():
     validator_map = {
     'parameter': CustomParameterValidator,
@@ -302,6 +318,7 @@ def main():
     app.add_url_rule("/api/v1/backoffice-service/health", "backoffice_health", backoffice_health)
     app.add_url_rule("/api/v1/data-metadata-service/health", "data_metadata_service_health", data_metadata_service_health)
     app.add_url_rule("/api/v1/processing-access-service/health", "processing_health", processing_health)
+    app.add_url_rule("/api/v1/email-sender-service/health", "email_sender_health", email_sender_health)
     path=os.getenv('BASECONTEXT')
     proxied = ReverseProxied(
         flask_app.wsgi_app,
