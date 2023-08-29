@@ -91,7 +91,7 @@ def remove_key(d, key):
     d.pop(key)
 
 def add_method_to_dynamic_controller(randomname, host, service, isauth, path_parameter_name = '') :
-    method_string = "\ndef "+randomname+"(instance_id=None):"
+    method_string = "\ndef "+randomname+"(meta_id=None, instance_id=None):"
     method_string+= "\n    server = '"+host+"'+os.getenv('BASECONTEXT')+'"+service+"'+connexion.request.base_url.split('/api/v1')[1]"
     if isauth :
         method_string+= "\n    return call_redirect(connexion.request.query_string, True, server)"
