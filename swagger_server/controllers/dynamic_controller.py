@@ -32,7 +32,7 @@ def call_redirect(query, isauthrequest, server):
                     query += "&userId=" + json_payload['eduPersonUniqueId']
                 if "sender" in connexion.request.path:
                     json_payload = json.loads(auth_response.response[0])
-                    query += "&userEmail=" + json_payload['email']
+                    query += "&userEmail=" + json_payload['email'] + "&firstName=" + json_payload['firstname'] + "&lastName=" + json_payload['lastName']
 
         except:
             return ("No authentication token provided or error while checking it...", 401, connexion.request.headers.items())
