@@ -60,7 +60,7 @@ def routingrequest(server, method, headers, query, body, request):
         if request.is_json:
             resp = requests.put(f'{server}?{query}', json=request.json, headers=headers, allow_redirects=False)
         else:
-            resp = requests.put(f'{server}?{query}', headers=headers, allow_redirects=False)
+            resp = requests.put(f'{server}?{query}', json=body, headers=headers, allow_redirects=False)
     if method == 'DELETE' :
         resp = requests.delete(f'{server}?{query}', data=body, headers=headers, allow_redirects=False)
 
