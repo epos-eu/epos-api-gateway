@@ -55,10 +55,10 @@ def routingrequest(server, method, headers, query, body, request):
         if request.is_json:
             resp = requests.post(f'{server}?{query}', json=request.json, headers=headers, allow_redirects=False)
         else:
-            resp = requests.post(f'{server}?{query}', json={}, headers=headers, allow_redirects=False)
+            resp = requests.post(f'{server}?{query}', json=body, headers=headers, allow_redirects=False)
     if method == 'PUT' :
         if request.is_json:
-            resp = requests.put(f'{server}?{query}', json=request.json, headers=request.headers, allow_redirects=False)
+            resp = requests.put(f'{server}?{query}', json=request.json, headers=headers, allow_redirects=False)
         else:
             resp = requests.put(f'{server}?{query}', headers=headers, allow_redirects=False)
     if method == 'DELETE' :
