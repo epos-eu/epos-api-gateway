@@ -67,4 +67,6 @@ def routingrequest(server, method, headers, query, body, request):
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
 
+    print(resp.text)
+
     return (json.loads(resp.text), resp.status_code, headers)
