@@ -15,7 +15,7 @@ INGESTOR_HOST = 'http://ingestor-service:8080'
 BACKOFFICE_HOST = 'http://backoffice-service:8080'
 CONVERTER_HOST = 'http://converter-service:8080'
 DATA_METADATA_HOST = 'http://data-metadata-service:8080'
-PROCESSING_ACCESS_HOST = 'http://processing-access-service:8080'
+PROCESSING_ACCESS_HOST = 'http://distributed-processing-service:8080'
 EMAIL_SENDER_HOST = 'http://email-sender-service:8080'
 
 RESOURCES_SERVICE = "/api/resources-service/v1"
@@ -23,7 +23,7 @@ EXTERNAL_SERVICE = "/api/external-access-service/v1"
 WORKSPACE_SERVICE = "/api/workspaces-service/v1"
 INGESTOR_SERVICE = "/api/ingestor-service/v1"
 BACKOFFICE_SERVICE = "/api/backoffice-service/v1"
-PROCESSING_SERVICE = "/api/processing-access-service/v1"
+PROCESSING_SERVICE = "/api/distributed-processing-service/v1"
 EMAIL_SENDER_SERVICE = "/api/email-sender-service/v1"
 
 def authorizationCall(bearer_token):
