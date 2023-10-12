@@ -73,8 +73,8 @@ def tcsconnections_ogc_execute_get_using_get(item):  # noqa: E501
 
     logging.warning(str(resp.headers))
     if str(resp.headers['content-type']) == "image/png" :
-        pad = len(resp.text)%4
-        text_len = len(resp.text)
+        pad = len(resp.content)%4
+        text_len = len(resp.content)
         code = resp.text[:text_len - pad]
         b = base64.urlsafe_b64decode(code.strip())
         #b = b.encode('utf-8')
