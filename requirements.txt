@@ -1,5 +1,5 @@
-connexion
-connexion[swagger-ui]
+connexion==2.14.2
+connexion[swagger-ui]==2.14.2
 python_dateutil
 setuptools
 swagger-ui-bundle
