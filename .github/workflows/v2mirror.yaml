@@ -12,6 +12,5 @@ jobs:
             - run: |
                   git remote add remote-repo https://github:${{secrets.GITLAB}}@epos-ci.brgm.fr/epos/epos-api-gateway.git
                   git fetch --unshallow
-                  git checkout -b v2
                   git push remote-repo v2
                   
