@@ -44,7 +44,7 @@ def call_redirect(query, isauthrequest, server):
                             connexion.request.form,
                             connexion.request)
 
-def tcsconnections_ogc_execute_get_using_get(item):  # noqa: E501
+def tcsconnections_ogc_execute_get_using_get(instance_id=None):  # noqa: E501
     """queries on external services endpoint
 
     this endpoint enable queries on external services from ics-c to tcs to get data to be visualized or downloaded # noqa: E501

@@ -115,8 +115,8 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth) :
         if 'trace' in json_loaded['paths'][key]: json_loaded['paths'][key].pop('trace')
         if 'tna' in key :
             remove_key(json_loaded['paths'], key)
-        if 'ogcexecute' in key:
-            change_dict_key_and_id(json_loaded['paths'], key, os.getenv('BASECONTEXT')+service)
+        #if 'ogcexecute' in key:
+        #    change_dict_key_and_id(json_loaded['paths'], key, os.getenv('BASECONTEXT')+service)
         change_dict_key(json_loaded['paths'], key, os.getenv('BASECONTEXT')+service)
 
     # CLEANUP Empty endpoints
@@ -128,8 +128,8 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth) :
     for key, value in list(json_loaded['paths'].items()):
         if "ogcexecute" in key:
             json_loaded['paths'][key]['get']['operationId'] = "tcsconnections_ogc_execute_get_using_get"
-            json_loaded['paths'][key]['get'].pop('parameters')
-            json_loaded['paths'][key]['get'].update(static_ogc_parameter)
+            #json_loaded['paths'][key]['get'].pop('parameters')
+            #json_loaded['paths'][key]['get'].update(static_ogc_parameter)
             json_loaded['paths'][key]['get']['x-openapi-router-controller'] = "swagger_server.controllers.dynamic_controller"
         else:
             if 'get' in json_loaded['paths'][key]:

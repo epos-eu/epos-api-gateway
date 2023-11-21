@@ -72,10 +72,5 @@ def routingrequest(server, method, headers, query, body, request):
     if len(resp.content) == 0:
         logging.warning("Empty body for the request")
         return (json.loads("{}"), resp.status_code, headers)
-    
-    logging.warning(resp.text)
-    logging.warning(resp.content)
-    logging.warning(type(resp.content))
-    logging.warning(type(resp.text))
 
     return (json.loads(resp.content), resp.status_code, headers)
