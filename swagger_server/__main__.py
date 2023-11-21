@@ -10,6 +10,7 @@ import string
 import yaml
 import traceback
 import requests
+from json import JSONEncoder
 
 from swagger_server.controllers import routing_request
 from connexion.decorators.response import ResponseValidator
@@ -107,6 +108,11 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth) :
     json_loaded['servers'][0]['url'] = 'http://localhost:5000/api/v1'
     for key, value in list(json_loaded['paths'].items()):
         print(key)
+        #cleanup paths
+        if 'head' in json_loaded['paths'][key]: json_loaded['paths'][key].pop('head')
+        if 'options' in json_loaded['paths'][key]: json_loaded['paths'][key].pop('options')
+        if 'patch' in json_loaded['paths'][key]: json_loaded['paths'][key].pop('patch')
+        if 'trace' in json_loaded['paths'][key]: json_loaded['paths'][key].pop('trace')
         if 'tna' in key :
             remove_key(json_loaded['paths'], key)
         if 'ogcexecute' in key:
@@ -308,7 +314,7 @@ def main():
     load_configuration()
 
     app = connexion.App(__name__, specification_dir='./swagger_generated/')
-    app.app.json_encoder = encoder.JSONEncoder
+    #app.app.json=JSONEncoder
     app.add_api('swagger_built.yaml', arguments={'title': 'API Gateway'},validator_map=validator_map, pythonic_params=True)
     flask_app = app.app
     app.add_url_rule("/api/v1/resources-service/health", "resources_health", resources_health)
