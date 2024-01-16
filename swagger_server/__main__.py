@@ -110,7 +110,7 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth) :
         print(key)
         #cleanup paths
         if 'head' in json_loaded['paths'][key]: json_loaded['paths'][key].pop('head')
-        if 'options' in json_loaded['paths'][key]: json_loaded['paths'][key].pop('options')
+        #if 'options' in json_loaded['paths'][key]: json_loaded['paths'][key].pop('options')
         if 'patch' in json_loaded['paths'][key]: json_loaded['paths'][key].pop('patch')
         if 'trace' in json_loaded['paths'][key]: json_loaded['paths'][key].pop('trace')
         if 'tna' in key :
@@ -145,6 +145,19 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth) :
                 json_loaded['paths'][key]['get']['x-openapi-router-controller'] = "swagger_server.controllers.dynamic_controller"
                 if isauth or ("monitoring" in key and os.getenv('IS_MONITORING_AUTH') == 'true'):
                     json_loaded['paths'][key]['get'].update(security_dict)
+            if 'options' in json_loaded['paths'][key]:
+                randomname = ''.join(random.choice(string.ascii_lowercase) for i in range(30))
+                if "monitoring" in key:
+                    add_method_to_dynamic_controller(randomname,host,service,os.getenv('IS_MONITORING_AUTH') == 'true')
+                else:
+                    if 'options' in value and 'parameters' in value['options'] and isinstance(value['options']['parameters'], list) and len(value['options']['parameters']) > 0 and 'in' in value['get']['parameters'][0] and 'name' in value['options']['parameters'][0] and value['options']['parameters'][0]['in'] == 'path':
+                        add_method_to_dynamic_controller(randomname,host,service,isauth, value['options']['parameters'][0]['name'])
+                    else :
+                        add_method_to_dynamic_controller(randomname,host,service,isauth)
+                json_loaded['paths'][key]['options']['operationId'] = randomname
+                json_loaded['paths'][key]['options']['x-openapi-router-controller'] = "swagger_server.controllers.dynamic_controller"
+                if isauth or ("monitoring" in key and os.getenv('IS_MONITORING_AUTH') == 'true'):
+                    json_loaded['paths'][key]['options'].update(security_dict)
             if 'post' in json_loaded['paths'][key]:
                 randomname = ''.join(random.choice(string.ascii_lowercase) for i in range(30))
                 add_method_to_dynamic_controller(randomname,host,service,isauth)
