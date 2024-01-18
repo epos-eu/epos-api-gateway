@@ -85,7 +85,7 @@ def change_dict_key(d, old_key, to_be_replaced, replacing="", default_value=None
 
 def change_dict_key_and_id(d, old_key, to_be_replaced, replacing="", default_value=None):
     new_key = old_key.replace(to_be_replaced,replacing)
-    new_key = new_key.replace("id","item")
+    new_key = new_key.replace("id","instance_id")
     d[new_key] = d.pop(old_key, default_value)
 
 def remove_key(d, key):
