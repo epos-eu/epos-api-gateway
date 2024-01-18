@@ -29,7 +29,7 @@ security_dict = yaml.safe_load('''
 
 static_ogc_parameter = yaml.safe_load('''
         parameters:
-        - name: item
+        - name: instance_id
           in: path
           description: the id of item to be executed
           required: true
@@ -128,8 +128,8 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth) :
     for key, value in list(json_loaded['paths'].items()):
         if "ogcexecute" in key:
             json_loaded['paths'][key]['get']['operationId'] = "tcsconnections_ogc_execute_get_using_get"
-            #json_loaded['paths'][key]['get'].pop('parameters')
-            #json_loaded['paths'][key]['get'].update(static_ogc_parameter)
+            json_loaded['paths'][key]['get'].pop('parameters')
+            json_loaded['paths'][key]['get'].update(static_ogc_parameter)
             json_loaded['paths'][key]['get']['x-openapi-router-controller'] = "swagger_server.controllers.dynamic_controller"
         else:
             if 'get' in json_loaded['paths'][key]:
