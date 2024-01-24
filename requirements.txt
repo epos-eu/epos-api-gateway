@@ -1,5 +1,6 @@
 connexion==2.14.2
 connexion[swagger-ui]==2.14.2
+flask-cors
 python_dateutil
 setuptools
 swagger-ui-bundle

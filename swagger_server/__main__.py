@@ -11,6 +11,8 @@ import yaml
 import traceback
 import requests
 from json import JSONEncoder
+from flask_cors import CORS
+
 
 from swagger_server.controllers import routing_request
 from connexion.decorators.response import ResponseValidator
@@ -330,6 +332,7 @@ def main():
     #app.app.json=JSONEncoder
     app.add_api('swagger_built.yaml', arguments={'title': 'API Gateway'},validator_map=validator_map, pythonic_params=True)
     flask_app = app.app
+    CORS(flask_app)
     app.add_url_rule("/api/v1/resources-service/health", "resources_health", resources_health)
     app.add_url_rule("/api/v1/ingestor-service/health", "ingestor_health", ingestor_health)
     app.add_url_rule("/api/v1/external-access-service/health", "exernal_access_health", exernal_access_health)
