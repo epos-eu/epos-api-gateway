@@ -169,9 +169,7 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth) :
                     json_loaded['paths'][key]['post'].update(security_dict)
             if 'put' in json_loaded['paths'][key]:
                 randomname = ''.join(random.choice(string.ascii_lowercase) for i in range(30))
-                if 'put' in value and 'parameters' in value['put'] and isinstance(value['put']['parameters'],list) \
-                        and len(value['put']['parameters']) > 0 and 'in' in value['put']['parameters'][0] and 'name' in \
-                        value['put']['parameters'][0] and value['put']['parameters'][0]['in'] == 'path':
+                if 'put' in value and 'parameters' in value['put'] and isinstance(value['put']['parameters'],list) and len(value['put']['parameters']) > 0 and 'in' in value['put']['parameters'][0] and 'name' in value['put']['parameters'][0] and value['put']['parameters'][0]['in'] == 'path':
                     add_method_to_dynamic_controller(randomname, host, service, isauth,
                                                      value['put']['parameters'][0]['name'])
                 else:

@@ -30,6 +30,7 @@ def call_redirect(query, isauthrequest, server):
                 if "monitoring" not in connexion.request.path:
                     json_payload = json.loads(auth_response.response[0])
                     query += "&userId=" + json_payload['eduPersonUniqueId']
+                    query += "&email=" + json_payload['email'] + "&firstName=" + json_payload['firstname'] + "&lastName=" + json_payload['lastName']
                 if "sender" in connexion.request.path:
                     json_payload = json.loads(auth_response.response[0])
                     query += "&userEmail=" + json_payload['email'] + "&firstName=" + json_payload['firstname'] + "&lastName=" + json_payload['lastName']
