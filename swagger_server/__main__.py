@@ -10,6 +10,9 @@ import string
 import yaml
 import traceback
 import requests
+from json import JSONEncoder
+from flask_cors import CORS
+
 
 from swagger_server.controllers import routing_request
 from connexion.decorators.response import ResponseValidator
@@ -28,7 +31,7 @@ security_dict = yaml.safe_load('''
 
 static_ogc_parameter = yaml.safe_load('''
         parameters:
-        - name: item
+        - name: instance_id
           in: path
           description: the id of item to be executed
           required: true
@@ -84,7 +87,7 @@ def change_dict_key(d, old_key, to_be_replaced, replacing="", default_value=None
 
 def change_dict_key_and_id(d, old_key, to_be_replaced, replacing="", default_value=None):
     new_key = old_key.replace(to_be_replaced,replacing)
-    new_key = new_key.replace("id","item")
+    new_key = new_key.replace("id","instance_id")
     d[new_key] = d.pop(old_key, default_value)
 
 def remove_key(d, key):
@@ -107,10 +110,15 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth) :
     json_loaded['servers'][0]['url'] = 'http://localhost:5000/api/v1'
     for key, value in list(json_loaded['paths'].items()):
         print(key)
+        #cleanup paths
+        if 'head' in json_loaded['paths'][key]: json_loaded['paths'][key].pop('head')
+        #if 'options' in json_loaded['paths'][key]: json_loaded['paths'][key].pop('options')
+        if 'patch' in json_loaded['paths'][key]: json_loaded['paths'][key].pop('patch')
+        if 'trace' in json_loaded['paths'][key]: json_loaded['paths'][key].pop('trace')
         if 'tna' in key :
             remove_key(json_loaded['paths'], key)
-        if 'ogcexecute' in key:
-            change_dict_key_and_id(json_loaded['paths'], key, os.getenv('BASECONTEXT')+service)
+        #if 'ogcexecute' in key:
+        #    change_dict_key_and_id(json_loaded['paths'], key, os.getenv('BASECONTEXT')+service)
         change_dict_key(json_loaded['paths'], key, os.getenv('BASECONTEXT')+service)
 
     # CLEANUP Empty endpoints
@@ -139,6 +147,19 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth) :
                 json_loaded['paths'][key]['get']['x-openapi-router-controller'] = "swagger_server.controllers.dynamic_controller"
                 if isauth or ("monitoring" in key and os.getenv('IS_MONITORING_AUTH') == 'true'):
                     json_loaded['paths'][key]['get'].update(security_dict)
+            if 'options' in json_loaded['paths'][key]:
+                randomname = ''.join(random.choice(string.ascii_lowercase) for i in range(30))
+                if "monitoring" in key:
+                    add_method_to_dynamic_controller(randomname,host,service,os.getenv('IS_MONITORING_AUTH') == 'true')
+                else:
+                    if 'options' in value and 'parameters' in value['options'] and isinstance(value['options']['parameters'], list) and len(value['options']['parameters']) > 0 and 'in' in value['get']['parameters'][0] and 'name' in value['options']['parameters'][0] and value['options']['parameters'][0]['in'] == 'path':
+                        add_method_to_dynamic_controller(randomname,host,service,isauth, value['options']['parameters'][0]['name'])
+                    else :
+                        add_method_to_dynamic_controller(randomname,host,service,isauth)
+                json_loaded['paths'][key]['options']['operationId'] = randomname
+                json_loaded['paths'][key]['options']['x-openapi-router-controller'] = "swagger_server.controllers.dynamic_controller"
+                if isauth or ("monitoring" in key and os.getenv('IS_MONITORING_AUTH') == 'true'):
+                    json_loaded['paths'][key]['options'].update(security_dict)
             if 'post' in json_loaded['paths'][key]:
                 randomname = ''.join(random.choice(string.ascii_lowercase) for i in range(30))
                 add_method_to_dynamic_controller(randomname,host,service,isauth)
@@ -148,9 +169,7 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth) :
                     json_loaded['paths'][key]['post'].update(security_dict)
             if 'put' in json_loaded['paths'][key]:
                 randomname = ''.join(random.choice(string.ascii_lowercase) for i in range(30))
-                if 'put' in value and 'parameters' in value['put'] and isinstance(value['put']['parameters'],list) \
-                        and len(value['put']['parameters']) > 0 and 'in' in value['put']['parameters'][0] and 'name' in \
-                        value['put']['parameters'][0] and value['put']['parameters'][0]['in'] == 'path':
+                if 'put' in value and 'parameters' in value['put'] and isinstance(value['put']['parameters'],list) and len(value['put']['parameters']) > 0 and 'in' in value['put']['parameters'][0] and 'name' in value['put']['parameters'][0] and value['put']['parameters'][0]['in'] == 'path':
                     add_method_to_dynamic_controller(randomname, host, service, isauth,
                                                      value['put']['parameters'][0]['name'])
                 else:
@@ -308,9 +327,10 @@ def main():
     load_configuration()
 
     app = connexion.App(__name__, specification_dir='./swagger_generated/')
-    app.app.json_encoder = encoder.JSONEncoder
+    #app.app.json=JSONEncoder
     app.add_api('swagger_built.yaml', arguments={'title': 'API Gateway'},validator_map=validator_map, pythonic_params=True)
     flask_app = app.app
+    CORS(flask_app)
     app.add_url_rule("/api/v1/resources-service/health", "resources_health", resources_health)
     app.add_url_rule("/api/v1/ingestor-service/health", "ingestor_health", ingestor_health)
     app.add_url_rule("/api/v1/external-access-service/health", "exernal_access_health", exernal_access_health)

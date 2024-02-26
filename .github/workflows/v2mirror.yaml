@@ -1,0 +1,16 @@
+name: "mirror v2"
+on:
+  push:
+    branches:
+      - v2
+
+jobs:
+    mirror:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - run: |
+                  git remote add remote-repo https://github:${{secrets.GITLAB}}@epos-ci.brgm.fr/epos/epos-api-gateway.git
+                  git fetch --unshallow
+                  git push remote-repo v2
+                  

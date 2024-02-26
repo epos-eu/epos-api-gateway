@@ -30,6 +30,7 @@ def call_redirect(query, isauthrequest, server):
                 if "monitoring" not in connexion.request.path:
                     json_payload = json.loads(auth_response.response[0])
                     query += "&userId=" + json_payload['eduPersonUniqueId']
+                    query += "&email=" + json_payload['email'] + "&firstName=" + json_payload['firstname'] + "&lastName=" + json_payload['lastName']
                 if "sender" in connexion.request.path:
                     json_payload = json.loads(auth_response.response[0])
                     query += "&userEmail=" + json_payload['email'] + "&firstName=" + json_payload['firstname'] + "&lastName=" + json_payload['lastName']
@@ -44,7 +45,7 @@ def call_redirect(query, isauthrequest, server):
                             connexion.request.form,
                             connexion.request)
 
-def tcsconnections_ogc_execute_get_using_get(item):  # noqa: E501
+def tcsconnections_ogc_execute_get_using_get(instance_id=None):  # noqa: E501
     """queries on external services endpoint
 
     this endpoint enable queries on external services from ics-c to tcs to get data to be visualized or downloaded # noqa: E501

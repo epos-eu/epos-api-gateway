@@ -64,6 +64,8 @@ def routingrequest(server, method, headers, query, body, request):
     if method == 'DELETE' :
         resp = requests.delete(f'{server}?{query}', data=body, headers=headers, allow_redirects=False)
 
+    logging.warning(resp)
+
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
 
