@@ -8,15 +8,17 @@ from flask import Response, send_file, make_response, jsonify
 import jwt
 import os
 
-RESOURCES_HOST = 'http://resources-service:8080'
-WORKSPACES_HOST = 'http://workspace-service:8080'
-EXTERNAL_ACCESS_HOST = 'http://external-access-service:8080'
-INGESTOR_HOST = 'http://ingestor-service:8080'
-BACKOFFICE_HOST = 'http://backoffice-service:8080'
-CONVERTER_HOST = 'http://converter-service:8080'
-DATA_METADATA_HOST = 'http://data-metadata-service:8080'
-PROCESSING_ACCESS_HOST = 'http://distributed-processing-service:8080'
-EMAIL_SENDER_HOST = 'http://email-sender-service:8080'
+PREFIX = os.getenv('PREFIX')
+
+RESOURCES_HOST = 'http://'+PREFIX+'resources-service:8080'
+WORKSPACES_HOST = 'http://'+PREFIX+'workspace-service:8080'
+EXTERNAL_ACCESS_HOST = 'http://'+PREFIX+'external-access-service:8080'
+INGESTOR_HOST = 'http://'+PREFIX+'ingestor-service:8080'
+BACKOFFICE_HOST = 'http://'+PREFIX+'backoffice-service:8080'
+CONVERTER_HOST = 'http://'+PREFIX+'converter-service:8080'
+DATA_METADATA_HOST = 'http://'+PREFIX+'data-metadata-service:8080'
+PROCESSING_ACCESS_HOST = 'http://'+PREFIX+'distributed-processing-service:8080'
+EMAIL_SENDER_HOST = 'http://'+PREFIX+'email-sender-service:8080'
 
 RESOURCES_SERVICE = "/api/resources-service/v1"
 EXTERNAL_SERVICE = "/api/external-access-service/v1"
