@@ -73,7 +73,7 @@ def tcsconnections_ogc_execute_get_using_get(instance_id=None):  # noqa: E501
     resp = requests.get(f'{server}?{query}', data=connexion.request.form, headers=connexion.request.headers, allow_redirects=False)
 
     logging.warning(str(resp.headers))
-    if str(resp.headers['content-type']) == "image/png" :
+    if str(resp.headers['content-type']).startswith("image/") :
         pad = len(resp.content)%4
         text_len = len(resp.content)
         code = resp.content[:text_len - pad]
@@ -81,7 +81,7 @@ def tcsconnections_ogc_execute_get_using_get(instance_id=None):  # noqa: E501
         #b = b.encode('utf-8')
         buf = io.BytesIO(b)
         buf.seek(0)
-        return send_file(buf, mimetype="image/png")
+        return send_file(buf, mimetype=resp.headers['content-type'])
     else:
          return Response(response=resp.content, status=resp.status_code,  mimetype=resp.headers['content-type'])
   
