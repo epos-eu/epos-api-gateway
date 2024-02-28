@@ -48,7 +48,6 @@ def routingrequest(server, method, headers, query, body, request):
     logging.warning('[headers]:\n'+str(headers)+'\n')
     logging.warning('[query]:\n'+str(query)+'\n')
     logging.warning('[body]:\n'+str(body)+'\n')
-
     logging.warning(f'{server}?{query}')    
 
     if method == 'GET' :
