@@ -12,6 +12,7 @@ import traceback
 import requests
 from json import JSONEncoder
 from flask_cors import CORS
+import sys
 
 
 from swagger_server.controllers import routing_request
@@ -202,6 +203,7 @@ def load_configuration():
         except:
             logging.error("Error executing fetch of resource host")
             traceback.print_exc()
+            sys.exit()
     if os.getenv('LOAD_INGESTOR_API') == "true" : 
         try:
             item = urllib.request.urlopen(routing_request.INGESTOR_HOST+os.getenv('BASECONTEXT')+routing_request.INGESTOR_SERVICE+"/api-docs")
@@ -211,6 +213,7 @@ def load_configuration():
         except:
             logging.error("Error executing fetch of ingestor host")
             traceback.print_exc()
+            sys.exit()
     if os.getenv('LOAD_EXTERNAL_ACCESS_API') == "true" : 
         try:
             item = urllib.request.urlopen(routing_request.EXTERNAL_ACCESS_HOST+os.getenv('BASECONTEXT')+routing_request.EXTERNAL_SERVICE+"/api-docs")
@@ -220,6 +223,7 @@ def load_configuration():
         except:
             logging.error("Error executing fetch of external access host")
             traceback.print_exc()
+            sys.exit()
     if os.getenv('LOAD_BACKOFFICE_API') == "true" :
         try:
             item = urllib.request.urlopen(routing_request.BACKOFFICE_HOST+os.getenv('BASECONTEXT')+routing_request.BACKOFFICE_SERVICE+"/api-docs")
@@ -229,6 +233,7 @@ def load_configuration():
         except:
             logging.error("Error executing fetch of backoffice host")
             traceback.print_exc()
+            sys.exit()
     if os.getenv('LOAD_PROCESSING_API') == "true" :
         try:
             item = urllib.request.urlopen(routing_request.PROCESSING_ACCESS_HOST+os.getenv('BASECONTEXT')+routing_request.PROCESSING_SERVICE+"/api-docs")
@@ -238,6 +243,7 @@ def load_configuration():
         except:
             logging.error("Error executing fetch of processing host")
             traceback.print_exc()
+            sys.exit()
     if os.getenv('LOAD_EMAIL_SENDER_API') == "true" :
         try:
             item = urllib.request.urlopen(routing_request.EMAIL_SENDER_HOST+os.getenv('BASECONTEXT')+routing_request.EMAIL_SENDER_SERVICE+"/api-docs")
@@ -247,6 +253,7 @@ def load_configuration():
         except:
             logging.error("Error executing fetch of processing host")
             traceback.print_exc()
+            sys.exit()
 
 
     # ADD Security component
