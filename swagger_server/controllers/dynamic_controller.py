@@ -84,7 +84,17 @@ def tcsconnections_ogc_execute_get_using_get(instance_id=None):  # noqa: E501
             buf.seek(0)
             return send_file(buf, mimetype=resp.headers['content-type'])
         else:
-            return Response(response=resp.content, status=resp.status_code,  mimetype=resp.headers['content-type'])
+            return routing_request.routingrequest(server,
+                            connexion.request.method, 
+                            connexion.request.headers, 
+                            query,
+                            connexion.request.form,
+                            connexion.request)
     
-    return Response(response=resp.content, status=resp.status_code)
+    return routing_request.routingrequest(server,
+                            connexion.request.method, 
+                            connexion.request.headers, 
+                            query,
+                            connexion.request.form,
+                            connexion.request)
   
