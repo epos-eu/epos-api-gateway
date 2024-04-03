@@ -39,16 +39,3 @@ container_scanning:
   script:
       - ./trivy image --exit-code 0 --severity HIGH --no-progress "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
       - ./trivy image --exit-code 1 --severity CRITICAL --no-progress "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
-
-release_tag:
-  stage: release
-  only:
-    - main
-  except:
-    - schedules
-  before_script:
-    - apk update && apk add git && apk add bash
-  script:
-    - git config user.email "${GITLAB_USER_EMAIL}"
-    - git config user.name "${GITLAB_USER_NAME}"
-    - bash ./autotag.sh
