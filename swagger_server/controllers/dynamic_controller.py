@@ -59,7 +59,7 @@ def tcsconnections_ogc_execute_get_using_get(instance_id=None):  # noqa: E501
     query = connexion.request.query_string.decode("utf-8") 
     query = urllib.parse.unquote(query)
 
-    server = routing_request.EXTERNAL_ACCESS_HOST+os.getenv('BASECONTEXT')+routing_request.EXTERNAL_SERVICE+connexion.request.base_url.split('/api/v1')[1]
+    server = routing_request.EXTERNAL_ACCESS_HOST+routing_request.EXTERNAL_SERVICE+connexion.request.base_url.split('/api/v1')[1]
     
     logging.warning('Executing the actual request with the following parameters: ')
     logging.warning('[server]:\n'+str(server)+'\n')
