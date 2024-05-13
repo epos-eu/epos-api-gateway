@@ -59,7 +59,7 @@ def tcsconnections_ogc_execute_get_using_get(instance_id=None):  # noqa: E501
     query = connexion.request.query_string.decode("utf-8") 
     query = urllib.parse.unquote(query)
 
-    server = routing_request.EXTERNAL_ACCESS_HOST+os.getenv('BASECONTEXT')+routing_request.EXTERNAL_SERVICE+connexion.request.base_url.split('/api/v1')[1]
+    server = routing_request.EXTERNAL_ACCESS_HOST+routing_request.EXTERNAL_SERVICE+connexion.request.base_url.split('/api/v1')[1]
     
     logging.warning('Executing the actual request with the following parameters: ')
     logging.warning('[server]:\n'+str(server)+'\n')
@@ -73,15 +73,28 @@ def tcsconnections_ogc_execute_get_using_get(instance_id=None):  # noqa: E501
     resp = requests.get(f'{server}?{query}', data=connexion.request.form, headers=connexion.request.headers, allow_redirects=False)
 
     logging.warning(str(resp.headers))
-    if str(resp.headers['content-type']).startswith("image/") :
-        pad = len(resp.content)%4
-        text_len = len(resp.content)
-        code = resp.content[:text_len - pad]
-        b = base64.urlsafe_b64decode(code.strip())
-        #b = b.encode('utf-8')
-        buf = io.BytesIO(b)
-        buf.seek(0)
-        return send_file(buf, mimetype=resp.headers['content-type'])
-    else:
-         return Response(response=resp.content, status=resp.status_code,  mimetype=resp.headers['content-type'])
+    if 'content-type' in resp.headers:
+        if str(resp.headers['content-type']).startswith("image/") :
+            pad = len(resp.content)%4
+            text_len = len(resp.content)
+            code = resp.content[:text_len - pad]
+            b = base64.urlsafe_b64decode(code.strip())
+            #b = b.encode('utf-8')
+            buf = io.BytesIO(b)
+            buf.seek(0)
+            return send_file(buf, mimetype=resp.headers['content-type'])
+        else:
+            return routing_request.routingrequest(server,
+                            connexion.request.method, 
+                            connexion.request.headers, 
+                            query,
+                            connexion.request.form,
+                            connexion.request)
+    
+    return routing_request.routingrequest(server,
+                            connexion.request.method, 
+                            connexion.request.headers, 
+                            query,
+                            connexion.request.form,
+                            connexion.request)
   

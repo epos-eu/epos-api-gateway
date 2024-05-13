@@ -12,6 +12,7 @@ import traceback
 import requests
 from json import JSONEncoder
 from flask_cors import CORS
+import sys
 
 
 from swagger_server.controllers import routing_request
@@ -95,7 +96,7 @@ def remove_key(d, key):
 
 def add_method_to_dynamic_controller(randomname, host, service, isauth, path_parameter_name = '') :
     method_string = "\ndef "+randomname+"(meta_id=None, instance_id=None):"
-    method_string+= "\n    server = '"+host+"'+os.getenv('BASECONTEXT')+'"+service+"'+connexion.request.base_url.split('/api/v1')[1]"
+    method_string+= "\n    server = '"+host+service+"'+connexion.request.base_url.split('/api/v1')[1]"
     if isauth :
         method_string+= "\n    return call_redirect(connexion.request.query_string, True, server)"
     else:
@@ -108,6 +109,7 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth) :
     json_loaded['info']['description'] = 'This is the API Gateway Swagger page.'
     json_loaded['info']['version'] = '1.0.0'
     json_loaded['servers'][0]['url'] = 'http://localhost:5000/api/v1'
+    
     for key, value in list(json_loaded['paths'].items()):
         print(key)
         #cleanup paths
@@ -119,7 +121,7 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth) :
             remove_key(json_loaded['paths'], key)
         #if 'ogcexecute' in key:
         #    change_dict_key_and_id(json_loaded['paths'], key, os.getenv('BASECONTEXT')+service)
-        change_dict_key(json_loaded['paths'], key, os.getenv('BASECONTEXT')+service)
+        change_dict_key(json_loaded['paths'], key, service)
 
     # CLEANUP Empty endpoints
     for key, value in list(json_loaded['paths'].items()):
@@ -195,58 +197,64 @@ def load_configuration():
     
     if os.getenv('LOAD_RESOURCES_API') == "true" : 
         try:
-            item = urllib.request.urlopen(routing_request.RESOURCES_HOST+os.getenv('BASECONTEXT')+routing_request.RESOURCES_SERVICE+"/api-docs")
+            item = urllib.request.urlopen(routing_request.RESOURCES_HOST+routing_request.RESOURCES_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
             manipulate_and_generate_yaml(json_loaded, r'./swagger_server/swagger_downloaded/resources.yaml',routing_request.RESOURCES_SERVICE, routing_request.RESOURCES_HOST, False)
             conf_array.append(open("./swagger_server/swagger_downloaded/resources.yaml", "r", encoding="utf-8").read())
         except:
             logging.error("Error executing fetch of resource host")
             traceback.print_exc()
+            sys.exit()
     if os.getenv('LOAD_INGESTOR_API') == "true" : 
         try:
-            item = urllib.request.urlopen(routing_request.INGESTOR_HOST+os.getenv('BASECONTEXT')+routing_request.INGESTOR_SERVICE+"/api-docs")
+            item = urllib.request.urlopen(routing_request.INGESTOR_HOST+routing_request.INGESTOR_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
             manipulate_and_generate_yaml(json_loaded, r'./swagger_server/swagger_downloaded/ingestor.yaml',routing_request.INGESTOR_SERVICE, routing_request.INGESTOR_HOST, False)
             conf_array.append(open("./swagger_server/swagger_downloaded/ingestor.yaml", "r", encoding="utf-8").read())
         except:
             logging.error("Error executing fetch of ingestor host")
             traceback.print_exc()
+            sys.exit()
     if os.getenv('LOAD_EXTERNAL_ACCESS_API') == "true" : 
         try:
-            item = urllib.request.urlopen(routing_request.EXTERNAL_ACCESS_HOST+os.getenv('BASECONTEXT')+routing_request.EXTERNAL_SERVICE+"/api-docs")
+            item = urllib.request.urlopen(routing_request.EXTERNAL_ACCESS_HOST+routing_request.EXTERNAL_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
             manipulate_and_generate_yaml(json_loaded, r'./swagger_server/swagger_downloaded/external.yaml',routing_request.EXTERNAL_SERVICE, routing_request.EXTERNAL_ACCESS_HOST, False)
             conf_array.append(open("./swagger_server/swagger_downloaded/external.yaml", "r", encoding="utf-8").read())
         except:
             logging.error("Error executing fetch of external access host")
             traceback.print_exc()
+            sys.exit()
     if os.getenv('LOAD_BACKOFFICE_API') == "true" :
         try:
-            item = urllib.request.urlopen(routing_request.BACKOFFICE_HOST+os.getenv('BASECONTEXT')+routing_request.BACKOFFICE_SERVICE+"/api-docs")
+            item = urllib.request.urlopen(routing_request.BACKOFFICE_HOST+routing_request.BACKOFFICE_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
             manipulate_and_generate_yaml(json_loaded, r'./swagger_server/swagger_downloaded/backoffice.yaml',routing_request.BACKOFFICE_SERVICE, routing_request.BACKOFFICE_HOST, os.getenv('IS_AAI_ENABLED') == 'true')
             conf_array.append(open("./swagger_server/swagger_downloaded/backoffice.yaml", "r", encoding="utf-8").read())
         except:
             logging.error("Error executing fetch of backoffice host")
             traceback.print_exc()
+            sys.exit()
     if os.getenv('LOAD_PROCESSING_API') == "true" :
         try:
-            item = urllib.request.urlopen(routing_request.PROCESSING_ACCESS_HOST+os.getenv('BASECONTEXT')+routing_request.PROCESSING_SERVICE+"/api-docs")
+            item = urllib.request.urlopen(routing_request.PROCESSING_ACCESS_HOST+routing_request.PROCESSING_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
             manipulate_and_generate_yaml(json_loaded, r'./swagger_server/swagger_downloaded/processing.yaml',routing_request.PROCESSING_SERVICE, routing_request.PROCESSING_ACCESS_HOST, os.getenv('IS_AAI_ENABLED') == 'true')
             conf_array.append(open("./swagger_server/swagger_downloaded/processing.yaml", "r", encoding="utf-8").read())
         except:
             logging.error("Error executing fetch of processing host")
             traceback.print_exc()
+            sys.exit()
     if os.getenv('LOAD_EMAIL_SENDER_API') == "true" :
         try:
-            item = urllib.request.urlopen(routing_request.EMAIL_SENDER_HOST+os.getenv('BASECONTEXT')+routing_request.EMAIL_SENDER_SERVICE+"/api-docs")
+            item = urllib.request.urlopen(routing_request.EMAIL_SENDER_HOST+routing_request.EMAIL_SENDER_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
             manipulate_and_generate_yaml(json_loaded, r'./swagger_server/swagger_downloaded/sender.yaml',routing_request.EMAIL_SENDER_SERVICE, routing_request.EMAIL_SENDER_HOST, os.getenv('IS_AAI_ENABLED') == 'true')
             conf_array.append(open("./swagger_server/swagger_downloaded/sender.yaml", "r", encoding="utf-8").read())
         except:
             logging.error("Error executing fetch of processing host")
             traceback.print_exc()
+            sys.exit()
 
 
     # ADD Security component
@@ -262,21 +270,21 @@ def load_configuration():
         file.close()
 
 def resources_health():
-    resp = requests.get(routing_request.RESOURCES_HOST+os.getenv('BASECONTEXT')+routing_request.RESOURCES_SERVICE+"/actuator/health", allow_redirects=False)
+    resp = requests.get(routing_request.RESOURCES_HOST+routing_request.RESOURCES_SERVICE+"/actuator/health", allow_redirects=False)
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
 
     return (json.loads(resp.text), resp.status_code, headers)
 
 def ingestor_health():
-    resp = requests.get(routing_request.INGESTOR_HOST+os.getenv('BASECONTEXT')+routing_request.INGESTOR_SERVICE+"/actuator/health", allow_redirects=False)
+    resp = requests.get(routing_request.INGESTOR_HOST+routing_request.INGESTOR_SERVICE+"/actuator/health", allow_redirects=False)
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
 
     return (json.loads(resp.text), resp.status_code, headers)
 
 def exernal_access_health():
-    resp = requests.get(routing_request.EXTERNAL_ACCESS_HOST+os.getenv('BASECONTEXT')+routing_request.EXTERNAL_SERVICE+"/actuator/health", allow_redirects=False)
+    resp = requests.get(routing_request.EXTERNAL_ACCESS_HOST+routing_request.EXTERNAL_SERVICE+"/actuator/health", allow_redirects=False)
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
 
@@ -290,7 +298,7 @@ def converter_health():
     return (json.loads(resp.text), resp.status_code, headers)
 
 def backoffice_health():
-    resp = requests.get(routing_request.BACKOFFICE_HOST+os.getenv('BASECONTEXT')+routing_request.BACKOFFICE_SERVICE+"/actuator/health", allow_redirects=False)
+    resp = requests.get(routing_request.BACKOFFICE_HOST+routing_request.BACKOFFICE_SERVICE+"/actuator/health", allow_redirects=False)
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
 
@@ -304,14 +312,14 @@ def data_metadata_service_health():
     return (json.loads(resp.text), resp.status_code, headers)
 
 def processing_health():
-    resp = requests.get(routing_request.PROCESSING_ACCESS_HOST+os.getenv('BASECONTEXT')+routing_request.PROCESSING_SERVICE+"/actuator/health", allow_redirects=False)
+    resp = requests.get(routing_request.PROCESSING_ACCESS_HOST+routing_request.PROCESSING_SERVICE+"/actuator/health", allow_redirects=False)
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
 
     return (json.loads(resp.text), resp.status_code, headers)
 
 def email_sender_health():
-    resp = requests.get(routing_request.EMAIL_SENDER_HOST+os.getenv('BASECONTEXT')+routing_request.EMAIL_SENDER_SERVICE+"/actuator/health", allow_redirects=False)
+    resp = requests.get(routing_request.EMAIL_SENDER_HOST+routing_request.EMAIL_SENDER_SERVICE+"/actuator/health", allow_redirects=False)
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
 
