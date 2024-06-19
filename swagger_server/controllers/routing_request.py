@@ -51,19 +51,19 @@ def routingrequest(server, method, headers, query, body, request):
     logging.warning(f'{server}?{query}')    
 
     if method == 'GET' :
-        resp = requests.get(f'{server}?{query}', data=body, headers=headers, allow_redirects=False)
+        resp = requests.get(f'{server}?{query}', data=body, headers=headers, allow_redirects=True)
     if method == 'POST' :
         if request.is_json:
-            resp = requests.post(f'{server}?{query}', json=request.json, headers=headers, allow_redirects=False)
+            resp = requests.post(f'{server}?{query}', json=request.json, headers=headers, allow_redirects=True)
         else:
-            resp = requests.post(f'{server}?{query}', json=body, headers=headers, allow_redirects=False)
+            resp = requests.post(f'{server}?{query}', json=body, headers=headers, allow_redirects=True)
     if method == 'PUT' :
         if request.is_json:
-            resp = requests.put(f'{server}?{query}', json=request.json, headers=headers, allow_redirects=False)
+            resp = requests.put(f'{server}?{query}', json=request.json, headers=headers, allow_redirects=True)
         else:
-            resp = requests.put(f'{server}?{query}', json=body, headers=headers, allow_redirects=False)
+            resp = requests.put(f'{server}?{query}', json=body, headers=headers, allow_redirects=True)
     if method == 'DELETE' :
-        resp = requests.delete(f'{server}?{query}', data=body, headers=headers, allow_redirects=False)
+        resp = requests.delete(f'{server}?{query}', data=body, headers=headers, allow_redirects=True)
 
     logging.warning(resp)
 
