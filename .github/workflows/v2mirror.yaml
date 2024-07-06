@@ -1,8 +1,8 @@
-name: "mirror v2"
+name: "mirror refactoring"
 on:
   push:
     branches:
-      - v2
+      - refactoring
 
 jobs:
     mirror:
@@ -12,5 +12,5 @@ jobs:
             - run: |
                   git remote add remote-repo https://github:${{secrets.GITLAB}}@epos-ci.brgm.fr/epos/epos-api-gateway.git
                   git fetch --unshallow
-                  git push remote-repo v2
+                  git push remote-repo refactoring
                   
