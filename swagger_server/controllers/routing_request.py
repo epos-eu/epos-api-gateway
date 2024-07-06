@@ -30,6 +30,7 @@ PROCESSING_SERVICE = "/api/distributed-processing-service/v1"
 EMAIL_SENDER_SERVICE = "/api/email-sender-service/v1"
 SHARING_SERVICE = "/api/sharing-service/v1"
 
+
 def authorizationCall(bearer_token):
     auth_response = requests.get(os.getenv('AAI_SERVICE_ENDPOINT'), headers={'Authorization': bearer_token})
     return Response(auth_response.content, auth_response.status_code)
