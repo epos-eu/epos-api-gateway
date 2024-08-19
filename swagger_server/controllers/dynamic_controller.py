@@ -70,9 +70,9 @@ def tcsconnections_ogc_execute_get_using_get(instance_id=None):  # noqa: E501
 
     logging.warning(f'{server}?{query}')    
 
-    resp = requests.get(f'{server}?{query}', data=connexion.request.form, headers=connexion.request.headers, allow_redirects=False)
+    #resp = requests.get(f'{server}?{query}', data=connexion.request.form, headers=connexion.request.headers, allow_redirects=False)
 
-    logging.warning(str(resp.headers))
+    #logging.warning(str(resp.headers))
     
     return routing_request.routingrequest(server,
                             connexion.request.method, 
