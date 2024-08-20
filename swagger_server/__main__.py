@@ -354,10 +354,8 @@ def main():
         script_name=path
     )
     flask_app.wsgi_app = proxied
-    #app.run(port=5000)
+    app.run(port=5000)
 
-    http_server = WSGIServer(('', 5000), app)
-    http_server.serve_forever()
 
 if __name__ == '__main__':
     main()
