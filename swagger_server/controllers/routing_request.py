@@ -2,6 +2,7 @@ import requests
 import json
 from flask import Response
 import logging
+import urllib.parse
 
 import requests
 from flask import Response, send_file, make_response, jsonify
@@ -42,6 +43,8 @@ def authorizationJWT(bearer_token):
 
 def routingrequest(server, method, headers, query, body, request):
 
+    query = urllib.parse.unquote(query)
+
     logging.warning('Executing the actual request with the following parameters: ')
     logging.warning('[server]:\n'+str(server)+'\n')
     logging.warning('[method]:\n'+str(method)+'\n')
@@ -70,8 +73,8 @@ def routingrequest(server, method, headers, query, body, request):
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
 
-    #if len(resp.content) == 0:
-    #    logging.warning("Empty body for the request")
-    #    return (json.loads("{}"), resp.status_code, headers)
+    if len(resp.content) == 0:
+        logging.warning("Empty body for the request")
+        return (json.loads("{}"), resp.status_code, headers)
 
-    return (resp.content, resp.status_code, headers)
+    return (json.loads(resp.content), resp.status_code, headers)

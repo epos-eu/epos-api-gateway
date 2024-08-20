@@ -9,3 +9,4 @@ hiyapyco
 pyjwt[crypto]
 py-healthcheck
 Flask
+urllib3
