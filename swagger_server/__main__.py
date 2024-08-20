@@ -13,6 +13,7 @@ import requests
 from json import JSONEncoder
 from flask_cors import CORS
 import sys
+from gevent.pywsgi import WSGIServer
 
 
 from swagger_server.controllers import routing_request
@@ -353,7 +354,10 @@ def main():
         script_name=path
     )
     flask_app.wsgi_app = proxied
-    app.run(port=5000)
+    #app.run(port=5000)
+
+    http_server = WSGIServer(('', 5000), app)
+    http_server.serve_forever()
 
 if __name__ == '__main__':
     main()
