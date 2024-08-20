@@ -78,5 +78,6 @@ def routingrequest(server, method, headers, query, body, request):
             logging.warning("Empty body for the request")
             return (json.loads("{}"), resp.status_code, headers)
         return (json.loads(resp.content), resp.status_code, headers)
-    except:
+    except Exception as e:
+        logging.warning(f"Exception raised on response from backend service: {e}")
         return (json.loads("{}"), resp.status_code, headers)
