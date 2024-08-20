@@ -71,10 +71,12 @@ def routingrequest(server, method, headers, query, body, request):
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
 
-    logging.warning("RESPONSE DEBUG : "+str(resp.status_code)+" "+resp.headers.get('content-type')+" "+json.loads(resp.content))
+    try:
+        logging.warning("RESPONSE DEBUG : "+str(resp.status_code)+" "+resp.headers.get('content-type')+" "+json.loads(resp.content))
 
-    if len(resp.content) == 0:
-        logging.warning("Empty body for the request")
+        if len(resp.content) == 0:
+            logging.warning("Empty body for the request")
+            return (json.loads("{}"), resp.status_code, headers)
+        return (json.loads(resp.content), resp.status_code, headers)
+    except:
         return (json.loads("{}"), resp.status_code, headers)
-    return (json.loads(resp.content), resp.status_code, headers)
-    
