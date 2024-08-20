@@ -70,8 +70,8 @@ def routingrequest(server, method, headers, query, body, request):
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
 
-    if len(resp.content) == 0:
-        logging.warning("Empty body for the request")
-        return (json.loads("{}"), resp.status_code, headers)
+    #if len(resp.content) == 0:
+    #    logging.warning("Empty body for the request")
+    #    return (json.loads("{}"), resp.status_code, headers)
 
-    return (json.loads(resp.content), resp.status_code, headers)
+    return (resp.content, resp.status_code, headers)
