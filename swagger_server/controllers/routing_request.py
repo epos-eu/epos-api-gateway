@@ -52,7 +52,9 @@ def routingrequest(server, method, headers, query, body, request):
     logging.warning(f'{server}?{query}')    
 
     if method == 'GET' :
-        resp = requests.get(f'{server}?{query}', data=body, headers=headers, allow_redirects=False)
+        with requests.get(f'{server}?{query}', data=body, headers=headers, allow_redirects=False) as r:
+            resp = r
+        #resp = requests.get(f'{server}?{query}', data=body, headers=headers, allow_redirects=False)
     if method == 'POST' :
         if request.is_json:
             resp = requests.post(f'{server}?{query}', json=request.json, headers=headers, allow_redirects=False)
