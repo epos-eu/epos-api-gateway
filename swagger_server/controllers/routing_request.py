@@ -52,7 +52,7 @@ def routingrequest(server, method, headers, query, body, request):
     logging.warning(f'{server}?{query}')    
 
     if method == 'GET' :
-        with requests.get(f'{server}?{query}', data=body, headers=headers, allow_redirects=False, stream=True, timeout=30) as r:
+        with requests.get(f'{server}?{query}', data=body, headers=headers, allow_redirects=False, stream=True) as r:
             resp = r
         #resp = requests.get(f'{server}?{query}', data=body, headers=headers, allow_redirects=False)
     if method == 'POST' :
