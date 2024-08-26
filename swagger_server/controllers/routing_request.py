@@ -57,10 +57,16 @@ def routingrequest(server, method, headers, query, body, request):
             headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
             logging.warning(resp.content)
             logging.warning(str(len(resp.content)))
-            if len(resp.content) == 0:
-                logging.warning("Empty body for the request")
+            try:
+                return (resp.content, resp.status_code, headers)
+            except Exception as e:
+                logging.warning("Exception "+str(e))
                 return (json.loads("{}"), resp.status_code, headers)
-            return (resp.content, resp.status_code, headers)
+                
+            #if len(resp.content) == 0:
+            #    logging.warning("Empty body for the request")
+            #    return (json.loads("{}"), resp.status_code, headers)
+            #return (resp.content, resp.status_code, headers)
         #resp = requests.get(f'{server}?{query}', data=body, headers=headers, allow_redirects=False)
     if method == 'POST' :
         if request.is_json:
