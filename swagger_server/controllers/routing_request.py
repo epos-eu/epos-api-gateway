@@ -52,7 +52,7 @@ def routingrequest(server, method, headers, query, body, request):
     logging.warning(f'{server}?{query}')    
 
     if method == 'GET' :
-        with requests.get(f'{server}?{query}', data=body, headers=headers, allow_redirects=False, stream=True) as r:
+        with requests.get(f'{server}?{query}', data=body, headers=headers, allow_redirects=False, stream=True, timeout=30) as r:
             resp = r
         #resp = requests.get(f'{server}?{query}', data=body, headers=headers, allow_redirects=False)
     if method == 'POST' :
@@ -75,11 +75,11 @@ def routingrequest(server, method, headers, query, body, request):
 
     logging.warning("RESPONSE DEBUG : "+str(resp.status_code)+" "+resp.headers.get('content-type'))
 
-    if resp.status_code == 302:
-        return (json.loads("{}"), resp.status_code, headers)
-
-    #if len(resp.content) == 0:
-    #    logging.warning("Empty body for the request")
+    #if resp.status_code == 302:
     #    return (json.loads("{}"), resp.status_code, headers)
+
+    if len(resp.content) == 0:
+        logging.warning("Empty body for the request")
+        return (json.loads("{}"), resp.status_code, headers)
     return (json.loads(resp.content), resp.status_code, headers)
     
