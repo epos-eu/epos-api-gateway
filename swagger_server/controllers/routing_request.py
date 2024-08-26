@@ -58,7 +58,7 @@ def routingrequest(server, method, headers, query, body, request):
             logging.warning(resp.content)
             logging.warning(str(len(resp.content)))
             try:
-                return (resp.content, resp.status_code, headers)
+                return (json.loads(resp.content), resp.status_code, headers)
             except Exception as e:
                 logging.warning("Exception "+str(e))
                 return (json.loads("{}"), resp.status_code, headers)
