@@ -66,16 +66,16 @@ def routingrequest(server, method, headers, query, body, request):
     if method == 'DELETE' :
         resp = requests.delete(f'{server}?{query}', data=body, headers=headers, allow_redirects=False)
 
-    logging.warning(resp)
+    logging.warning("RESPONSE DEBUG : "+str(resp.status_code)+" "+resp.headers.get('content-type'))
 
-    #excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
-    excluded_headers = []
-    headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
-
-    #logging.warning("RESPONSE DEBUG : "+str(resp.status_code)+" "+resp.headers.get('content-type')+" "+json.loads(resp.content))
-
-    if len(resp.content) == 0:
-        logging.warning("Empty body for the request")
+    if resp.status_code == 302:
         return (json.loads("{}"), resp.status_code, headers)
+
+    #if len(resp.content) == 0:
+    #    logging.warning("Empty body for the request")
+    #    return (json.loads("{}"), resp.status_code, headers)
+    excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
+    headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
+    
     return (json.loads(resp.content), resp.status_code, headers)
     
