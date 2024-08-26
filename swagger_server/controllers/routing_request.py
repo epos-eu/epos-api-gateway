@@ -52,32 +52,30 @@ def routingrequest(server, method, headers, query, body, request):
     logging.warning(f'{server}?{query}')    
 
     if method == 'GET' :
-        resp = requests.get(f'{server}?{query}', data=body, headers=headers, allow_redirects=False, stream=True)
+        resp = requests.get(f'{server}?{query}', data=body, headers=headers, allow_redirects=False)
     if method == 'POST' :
         if request.is_json:
-            resp = requests.post(f'{server}?{query}', json=request.json, headers=headers, allow_redirects=False, stream=True)
+            resp = requests.post(f'{server}?{query}', json=request.json, headers=headers, allow_redirects=False)
         else:
-            resp = requests.post(f'{server}?{query}', json=body, headers=headers, allow_redirects=False, stream=True)
+            resp = requests.post(f'{server}?{query}', json=body, headers=headers, allow_redirects=False)
     if method == 'PUT' :
         if request.is_json:
-            resp = requests.put(f'{server}?{query}', json=request.json, headers=headers, allow_redirects=False, stream=True)
+            resp = requests.put(f'{server}?{query}', json=request.json, headers=headers, allow_redirects=False)
         else:
-            resp = requests.put(f'{server}?{query}', json=body, headers=headers, allow_redirects=False, stream=True)
+            resp = requests.put(f'{server}?{query}', json=body, headers=headers, allow_redirects=False)
     if method == 'DELETE' :
-        resp = requests.delete(f'{server}?{query}', data=body, headers=headers, allow_redirects=False, stream=True)
+        resp = requests.delete(f'{server}?{query}', data=body, headers=headers, allow_redirects=False)
 
     logging.warning(resp)
 
-    excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
+    #excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
+    excluded_headers = []
     headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
 
-    try:
-        logging.warning("RESPONSE DEBUG : "+str(resp.status_code)+" "+resp.headers.get('content-type')+" "+json.loads(resp.content))
+    #logging.warning("RESPONSE DEBUG : "+str(resp.status_code)+" "+resp.headers.get('content-type')+" "+json.loads(resp.content))
 
-        if len(resp.content) == 0:
-            logging.warning("Empty body for the request")
-            return (json.loads("{}"), resp.status_code, headers)
-        return (json.loads(resp.content), resp.status_code, headers)
-    except Exception as e:
-        logging.warning(f"Exception raised on response from backend service: {e}")
+    if len(resp.content) == 0:
+        logging.warning("Empty body for the request")
         return (json.loads("{}"), resp.status_code, headers)
+    return (json.loads(resp.content), resp.status_code, headers)
+    
