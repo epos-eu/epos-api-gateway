@@ -55,6 +55,7 @@ def routingrequest(server, method, headers, query, body, request):
         with requests.get(f'{server}?{query}', data=body, headers=headers, allow_redirects=False, stream=True) as resp:
             excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
             headers = [(name, value) for (name, value) in  resp.raw.headers.items() if name.lower() not in excluded_headers]
+            logging.warning(str(len(resp.content)))
             if len(resp.content) == 0:
                 logging.warning("Empty body for the request")
                 return (json.loads("{}"), resp.status_code, headers)
