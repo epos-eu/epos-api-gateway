@@ -60,7 +60,7 @@ def routingrequest(server, method, headers, query, body, request):
             if len(resp.content) == 0:
                 logging.warning("Empty body for the request")
                 return (json.loads("{}"), resp.status_code, headers)
-            return (json.loads(resp.content), resp.status_code, headers)
+            return (resp.content, resp.status_code, headers)
         #resp = requests.get(f'{server}?{query}', data=body, headers=headers, allow_redirects=False)
     if method == 'POST' :
         if request.is_json:
