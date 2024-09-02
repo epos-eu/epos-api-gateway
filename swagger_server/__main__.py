@@ -256,6 +256,17 @@ def load_configuration():
             logging.error("Error executing fetch of processing host")
             traceback.print_exc()
             sys.exit()
+    if os.getenv('LOAD_SHARING_API') == "true" :
+        try:
+            item = urllib.request.urlopen(routing_request.SHARING_HOST+routing_request.SHARING_SERVICE+"/api-docs")
+            json_loaded = json.loads(item.read())
+            manipulate_and_generate_yaml(json_loaded, r'./swagger_server/swagger_downloaded/sharing.yaml',routing_request.SHARING_SERVICE, routing_request.SHARING_HOST, os.getenv('IS_AAI_ENABLED') == 'false')
+            conf_array.append(open("./swagger_server/swagger_downloaded/sharing.yaml", "r", encoding="utf-8").read())
+        except:
+            logging.error("Error executing fetch of processing host")
+            traceback.print_exc()
+            sys.exit()
+
 
 
     # ADD Security component
