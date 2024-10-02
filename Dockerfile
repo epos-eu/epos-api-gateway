@@ -1,5 +1,9 @@
 FROM python:3.12.0a7-slim-buster
 
+ENV API_VERSION="1.0.0"
+ENV API_TITLE="API Gateway"
+ENV CONTACT_EMAIL="apis@lists.epos-ip.org"
+
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 

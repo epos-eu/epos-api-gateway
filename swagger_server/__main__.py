@@ -25,6 +25,7 @@ import os
 import hiyapyco
 
 from swagger_server import encoder
+from swagger_server.swagger_description import get_description, get_version, get_contact_email, get_api_title
 
 security_dict = yaml.safe_load('''
         security:
@@ -106,11 +107,15 @@ def add_method_to_dynamic_controller(randomname, host, service, isauth, path_par
         myfile.write(method_string)
 
 def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth) :
-    json_loaded['info']['title'] = 'API Gateway'
-    json_loaded['info']['description'] = 'This is the API Gateway Swagger page.'
-    json_loaded['info']['version'] = '1.0.0'
+    json_loaded['info']['title'] = get_api_title()
+    json_loaded['info']['description'] = get_description()
+    json_loaded['info']['version'] = get_version()
+    try:
+        json_loaded['info']['contact']['email'] = get_contact_email()
+    except:
+        json_loaded['info']['contact'] = {"email" : get_contact_email()}
     json_loaded['servers'][0]['url'] = 'http://localhost:5000/api/v1'
-    
+
     for key, value in list(json_loaded['paths'].items()):
         print(key)
         #cleanup paths
@@ -195,8 +200,8 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth) :
 def load_configuration():
 
     conf_array = []
-    
-    if os.getenv('LOAD_RESOURCES_API') == "true" : 
+
+    if os.getenv('LOAD_RESOURCES_API') == "true" :
         try:
             item = urllib.request.urlopen(routing_request.RESOURCES_HOST+routing_request.RESOURCES_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
@@ -206,7 +211,7 @@ def load_configuration():
             logging.error("Error executing fetch of resource host")
             traceback.print_exc()
             sys.exit()
-    if os.getenv('LOAD_INGESTOR_API') == "true" : 
+    if os.getenv('LOAD_INGESTOR_API') == "true" :
         try:
             item = urllib.request.urlopen(routing_request.INGESTOR_HOST+routing_request.INGESTOR_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
@@ -216,7 +221,7 @@ def load_configuration():
             logging.error("Error executing fetch of ingestor host")
             traceback.print_exc()
             sys.exit()
-    if os.getenv('LOAD_EXTERNAL_ACCESS_API') == "true" : 
+    if os.getenv('LOAD_EXTERNAL_ACCESS_API') == "true" :
         try:
             item = urllib.request.urlopen(routing_request.EXTERNAL_ACCESS_HOST+routing_request.EXTERNAL_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
