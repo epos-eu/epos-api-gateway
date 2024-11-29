@@ -15,6 +15,8 @@ In this documentation, you will find the list of services, their respective endp
 Please be aware that some endpoints may not be fully documented at this time. Additionally, these APIs are primarily intended for use by the platform's GUI and not for direct exploration of the data catalog.
 
 Use this documentation as a reference for understanding the available services, but keep in mind that the focus of these endpoints is on supporting the internal functionality of the EPOS Platform.
+
+For more information on how the EPOS Platform works you can reference the documentation of the [EPOS OpenSouce Project](https://epos-eu.github.io/epos-open-source/).
     
 """.format(**{"api_title": get_api_title()})
 
