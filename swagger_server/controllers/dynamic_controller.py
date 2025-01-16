@@ -37,6 +37,19 @@ def call_redirect(query, isauthrequest, server):
 
         except:
             return ("No authentication token provided or error while checking it...", 401, connexion.request.headers.items())
+    
+    if "search" in connexion.request.path:
+        try:
+            auth_response = ""
+            auth_response = routing_request.authorizationCall(connexion.request.headers['Authorization'])
+            if auth_response.status_code == 401 :
+                print("Wrong or expired auth token provided for search endpoints, skipping auth")
+            else:
+                json_payload = json.loads(auth_response.response[0])
+                query += "&userId=" + json_payload['eduPersonUniqueId']
+        except:
+            print("No auth token provided for search endpoints, skipping auth")
+
 
     return routing_request.routingrequest(server,
                             connexion.request.method, 
