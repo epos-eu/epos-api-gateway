@@ -97,7 +97,7 @@ def remove_key(d, key):
     d.pop(key)
 
 def add_method_to_dynamic_controller(randomname, host, service, isauth, path_parameter_name = '') :
-    method_string = "\ndef "+randomname+"(meta_id=None, instance_id=None):"
+    method_string = "\ndef "+randomname+"(meta_id=None, instance_id=None, plugin_id=None):"
     method_string+= "\n    server = '"+host+service+"'+connexion.request.base_url.split('/api/v1')[1]"
     if isauth :
         method_string+= "\n    return call_redirect(connexion.request.query_string, True, server)"
@@ -201,6 +201,25 @@ def load_configuration():
 
     conf_array = []
 
+    if os.getenv('LOAD_CONVERTER_API') == "true" :
+        try:
+            item = urllib.request.urlopen(routing_request.CONVERTER_HOST+routing_request.CONVERTER_SERVICE+"/api-docs")
+            json_loaded = json.loads(item.read())
+            manipulate_and_generate_yaml(json_loaded, r'./swagger_server/swagger_downloaded/converter.yaml',routing_request.CONVERTER_SERVICE, routing_request.CONVERTER_HOST, False)
+            conf_array.append(open("./swagger_server/swagger_downloaded/converter.yaml", "r", encoding="utf-8").read())
+        except:
+            logging.error("Error executing fetch of converter host")
+            traceback.print_exc()
+            sys.exit()
+        try:
+            item = urllib.request.urlopen(routing_request.CONVERTER_ROUTINE_HOST+routing_request.CONVERTER_ROUTINE_SERVICE+"/api-docs")
+            json_loaded = json.loads(item.read())
+            manipulate_and_generate_yaml(json_loaded, r'./swagger_server/swagger_downloaded/converter-routine.yaml',routing_request.CONVERTER_ROUTINE_SERVICE, routing_request.CONVERTER_ROUTINE_HOST, False)
+            conf_array.append(open("./swagger_server/swagger_downloaded/converter-routine.yaml", "r", encoding="utf-8").read())
+        except:
+            logging.error("Error executing fetch of converter host")
+            traceback.print_exc()
+            sys.exit()
     if os.getenv('LOAD_RESOURCES_API') == "true" :
         try:
             item = urllib.request.urlopen(routing_request.RESOURCES_HOST+routing_request.RESOURCES_SERVICE+"/api-docs")
@@ -344,10 +363,10 @@ def email_sender_health():
 
 def main():
     validator_map = {
-    'parameter': CustomParameterValidator,
-    'body': CustomRequestBodyValidator,
-    'response': ResponseValidator,
-}
+        'parameter': CustomParameterValidator,
+        'body': CustomRequestBodyValidator,
+        'response': ResponseValidator,
+    }
 
     load_configuration()
 

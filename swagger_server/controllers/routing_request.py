@@ -17,6 +17,7 @@ EXTERNAL_ACCESS_HOST = 'http://'+PREFIX+'external-access-service:8080'
 INGESTOR_HOST = 'http://'+PREFIX+'ingestor-service:8080'
 BACKOFFICE_HOST = 'http://'+PREFIX+'backoffice-service:8080'
 CONVERTER_HOST = 'http://'+PREFIX+'converter-service:8080'
+CONVERTER_ROUTINE_HOST = 'http://'+PREFIX+'converter-routine:8080'
 DATA_METADATA_HOST = 'http://'+PREFIX+'data-metadata-service:8080'
 PROCESSING_ACCESS_HOST = 'http://'+PREFIX+'distributed-processing-service:8080'
 EMAIL_SENDER_HOST = 'http://'+PREFIX+'email-sender-service:8080'
@@ -30,6 +31,8 @@ BACKOFFICE_SERVICE = "/api/backoffice-service/v1"
 PROCESSING_SERVICE = "/api/distributed-processing-service/v1"
 EMAIL_SENDER_SERVICE = "/api/email-sender-service/v1"
 SHARING_SERVICE = "/api/sharing-service/v1"
+CONVERTER_SERVICE = "/api/converter-service/v1"
+CONVERTER_ROUTINE_SERVICE = "/api/converter-routine/v1"
 
 
 def authorizationCall(bearer_token):
