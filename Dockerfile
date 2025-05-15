@@ -13,6 +13,10 @@ RUN pip3 install --upgrade pip
 RUN apt-get update && apt-get install -y gcc libffi-dev
 RUN pip3 install --no-cache-dir -r requirements.txt
 
+RUN pip3 install opentelemetry-distro
+RUN pip3 install opentelemetry-exporter-otlp-proto-http
+RUN opentelemetry-bootstrap -a install
+
 COPY . /usr/src/app
 
 RUN mkdir ./swagger_server/swagger_downloaded
