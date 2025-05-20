@@ -39,6 +39,19 @@ def authorizationCall(bearer_token):
     auth_response = requests.get(os.getenv('AAI_SERVICE_ENDPOINT'), headers={'Authorization': bearer_token})
     return Response(auth_response.content, auth_response.status_code)
 
+def isAdmin(bearer_token: str, query: str) -> bool:
+    try:
+        response = requests.get(BACKOFFICE_HOST + BACKOFFICE_SERVICE + '/user/self?' + query, headers={'Authorization': bearer_token})
+
+        content_str = response.content.decode('utf-8')
+        parsed_json = json.loads(content_str)
+        # it returns a list with just one item
+        user_data = parsed_json[0]
+
+        return user_data.get("isAdmin", False)
+    except:
+        return False
+
 def authorizationJWT(bearer_token):
     bearer_token = bearer_token.replace("Bearer ", "")
     decoded = jwt.decode(bearer_token, os.getenv('SECURITY_KEY'), algorithms=["HS256"])
