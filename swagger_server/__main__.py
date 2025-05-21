@@ -43,6 +43,38 @@ static_ogc_parameter = yaml.safe_load('''
             type: string
 ''')
 
+def getenv_split(name: str, sep: str = ":") -> tuple[bool, bool] | None:
+    raw = os.getenv(name)
+    if raw is None:
+        return None
+
+    if not is_AAI_Enabled:
+        return False, False
+
+    try:
+        first, second = raw.split(sep, 1)
+    except ValueError:  # not exactly two parts
+        logging.warning(f"{name} must contain exactly two values separated by {sep!r}, "
+            f"e.g. 'true:false'; got {raw!r}. Considering it as not set")
+        return None
+
+    truthy = {"1", "true", "yes", "on"}
+    to_bool = lambda s: s.strip().lower() in truthy
+
+    return to_bool(first), to_bool(second)
+
+is_AAI_Enabled = os.getenv('IS_AAI_ENABLED') == 'true'
+
+resources_api_setup = getenv_split('LOAD_RESOURCES_API')
+ingestor_api_setup = getenv_split('LOAD_INGESTOR_API')
+external_api_setup = getenv_split('LOAD_EXTERNAL_ACCESS_API')
+backoffice_api_setup = getenv_split('LOAD_BACKOFFICE_API')
+processing_api_setup = getenv_split('LOAD_PROCESSING_API')
+sharing_api_setup = getenv_split('LOAD_SHARING_API')
+converter_api_setup = getenv_split('LOAD_CONVERTER_API')
+monitoring_api_setup = getenv_split('LOAD_MONITORING_API')
+email_sender_api_setup = getenv_split('LOAD_EMAIL_SENDER_API')
+
 class ReverseProxied(object):
     '''Wrap the application in this middleware and configure the
     reverse proxy to add these headers, to let you quietly bind
@@ -96,17 +128,20 @@ def change_dict_key_and_id(d, old_key, to_be_replaced, replacing="", default_val
 def remove_key(d, key):
     d.pop(key)
 
-def add_method_to_dynamic_controller(randomname, host, service, isauth, path_parameter_name = '') :
+def add_method_to_dynamic_controller(randomname, host, service, isauth, only_admin: bool = False) :
     method_string = "\ndef "+randomname+"(meta_id=None, instance_id=None, plugin_id=None, relation_id=None):"
     method_string+= "\n    server = '"+host+service+"'+connexion.request.base_url.split('/api/v1')[1]"
-    if isauth :
-        method_string+= "\n    return call_redirect(connexion.request.query_string, True, server)"
+    if isauth:
+        if only_admin:
+            method_string+= "\n    return call_redirect(connexion.request.query_string, True, server, True)"
+        else:
+            method_string+= "\n    return call_redirect(connexion.request.query_string, True, server, False)"
     else:
-        method_string+= "\n    return call_redirect(connexion.request.query_string, False, server)"
+        method_string+= "\n    return call_redirect(connexion.request.query_string, False, server, False)"
     with open("./swagger_server/controllers/dynamic_controller.py", "a") as myfile:
         myfile.write(method_string)
 
-def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth) :
+def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth: bool, only_admin: bool = False) :
     json_loaded['info']['title'] = get_api_title()
     json_loaded['info']['description'] = get_description()
     json_loaded['info']['version'] = get_version()
@@ -143,34 +178,46 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth) :
             json_loaded['paths'][key]['get']['x-openapi-router-controller'] = "swagger_server.controllers.dynamic_controller"
         else:
             if 'get' in json_loaded['paths'][key]:
-                randomname = ''.join(random.choice(string.ascii_lowercase) for i in range(30))
-                if "monitoring" in key:
-                    add_method_to_dynamic_controller(randomname,host,service,os.getenv('IS_MONITORING_AUTH') == 'true')
+                randomname = ''.join(random.choice(string.ascii_lowercase) for _ in range(30))
+                if "monitoring" in key and monitoring_api_setup:
+                    add_method_to_dynamic_controller(
+                        randomname,
+                        host,
+                        service,
+                        monitoring_api_setup[0],
+                        monitoring_api_setup[1],
+                    )
                 else:
                     if 'get' in value and 'parameters' in value['get'] and isinstance(value['get']['parameters'], list) and len(value['get']['parameters']) > 0 and 'in' in value['get']['parameters'][0] and 'name' in value['get']['parameters'][0] and value['get']['parameters'][0]['in'] == 'path':
-                        add_method_to_dynamic_controller(randomname,host,service,isauth, value['get']['parameters'][0]['name'])
+                        add_method_to_dynamic_controller(randomname, host, service, isauth, only_admin)
                     else :
-                        add_method_to_dynamic_controller(randomname,host,service,isauth)
+                        add_method_to_dynamic_controller(randomname, host, service, isauth, only_admin)
                 json_loaded['paths'][key]['get']['operationId'] = randomname
                 json_loaded['paths'][key]['get']['x-openapi-router-controller'] = "swagger_server.controllers.dynamic_controller"
-                if isauth or ("monitoring" in key and os.getenv('IS_MONITORING_AUTH') == 'true'):
+                if isauth or ("monitoring" in key and monitoring_api_setup and monitoring_api_setup[0]):
                     json_loaded['paths'][key]['get'].update(security_dict)
             if 'options' in json_loaded['paths'][key]:
                 randomname = ''.join(random.choice(string.ascii_lowercase) for i in range(30))
-                if "monitoring" in key:
-                    add_method_to_dynamic_controller(randomname,host,service,os.getenv('IS_MONITORING_AUTH') == 'true')
+                if "monitoring" in key and monitoring_api_setup:
+                    add_method_to_dynamic_controller(
+                        randomname,
+                        host,
+                        service,
+                        monitoring_api_setup[0],
+                        monitoring_api_setup[1],
+                    )
                 else:
                     if 'options' in value and 'parameters' in value['options'] and isinstance(value['options']['parameters'], list) and len(value['options']['parameters']) > 0 and 'in' in value['get']['parameters'][0] and 'name' in value['options']['parameters'][0] and value['options']['parameters'][0]['in'] == 'path':
-                        add_method_to_dynamic_controller(randomname,host,service,isauth, value['options']['parameters'][0]['name'])
+                        add_method_to_dynamic_controller(randomname,host,service,isauth, only_admin)
                     else :
-                        add_method_to_dynamic_controller(randomname,host,service,isauth)
+                        add_method_to_dynamic_controller(randomname,host,service,isauth, only_admin)
                 json_loaded['paths'][key]['options']['operationId'] = randomname
                 json_loaded['paths'][key]['options']['x-openapi-router-controller'] = "swagger_server.controllers.dynamic_controller"
-                if isauth or ("monitoring" in key and os.getenv('IS_MONITORING_AUTH') == 'true'):
+                if isauth or ("monitoring" in key and monitoring_api_setup and monitoring_api_setup[0]):
                     json_loaded['paths'][key]['options'].update(security_dict)
             if 'post' in json_loaded['paths'][key]:
                 randomname = ''.join(random.choice(string.ascii_lowercase) for i in range(30))
-                add_method_to_dynamic_controller(randomname,host,service,isauth)
+                add_method_to_dynamic_controller(randomname,host,service,isauth, only_admin)
                 json_loaded['paths'][key]['post']['operationId'] = randomname
                 json_loaded['paths'][key]['post']['x-openapi-router-controller'] = "swagger_server.controllers.dynamic_controller"
                 if isauth :
@@ -178,17 +225,16 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth) :
             if 'put' in json_loaded['paths'][key]:
                 randomname = ''.join(random.choice(string.ascii_lowercase) for i in range(30))
                 if 'put' in value and 'parameters' in value['put'] and isinstance(value['put']['parameters'],list) and len(value['put']['parameters']) > 0 and 'in' in value['put']['parameters'][0] and 'name' in value['put']['parameters'][0] and value['put']['parameters'][0]['in'] == 'path':
-                    add_method_to_dynamic_controller(randomname, host, service, isauth,
-                                                     value['put']['parameters'][0]['name'])
+                    add_method_to_dynamic_controller(randomname, host, service, isauth, only_admin)
                 else:
-                    add_method_to_dynamic_controller(randomname, host, service, isauth)
+                    add_method_to_dynamic_controller(randomname, host, service, isauth, only_admin)
                 json_loaded['paths'][key]['put']['operationId'] = randomname
                 json_loaded['paths'][key]['put']['x-openapi-router-controller'] = "swagger_server.controllers.dynamic_controller"
                 if isauth :
                     json_loaded['paths'][key]['put'].update(security_dict)
             if 'delete' in json_loaded['paths'][key]:
                 randomname = ''.join(random.choice(string.ascii_lowercase) for i in range(30))
-                add_method_to_dynamic_controller(randomname,host,service,isauth)
+                add_method_to_dynamic_controller(randomname,host,service,isauth, only_admin)
                 json_loaded['paths'][key]['delete']['operationId'] = randomname
                 json_loaded['paths'][key]['delete']['x-openapi-router-controller'] = "swagger_server.controllers.dynamic_controller"
                 if isauth :
@@ -197,15 +243,24 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth) :
     with open(filename, 'w') as file:
         documents = yaml.dump(json_loaded, file)
 
-def load_configuration():
 
+
+
+def load_configuration():
     conf_array = []
 
-    if os.getenv('LOAD_CONVERTER_API') == "true" :
+    if converter_api_setup :
         try:
             item = urllib.request.urlopen(routing_request.CONVERTER_HOST+routing_request.CONVERTER_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
-            manipulate_and_generate_yaml(json_loaded, r'./swagger_server/swagger_downloaded/converter.yaml',routing_request.CONVERTER_SERVICE, routing_request.CONVERTER_HOST, False)
+            manipulate_and_generate_yaml(
+                json_loaded,
+                r'./swagger_server/swagger_downloaded/converter.yaml',
+                routing_request.CONVERTER_SERVICE,
+                routing_request.CONVERTER_HOST,
+                converter_api_setup[0],
+                converter_api_setup[1],
+            )
             conf_array.append(open("./swagger_server/swagger_downloaded/converter.yaml", "r", encoding="utf-8").read())
         except:
             logging.error("Error executing fetch of converter host")
@@ -214,83 +269,138 @@ def load_configuration():
         try:
             item = urllib.request.urlopen(routing_request.CONVERTER_ROUTINE_HOST+routing_request.CONVERTER_ROUTINE_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
-            manipulate_and_generate_yaml(json_loaded, r'./swagger_server/swagger_downloaded/converter-routine.yaml',routing_request.CONVERTER_ROUTINE_SERVICE, routing_request.CONVERTER_ROUTINE_HOST, False)
+            manipulate_and_generate_yaml(
+                json_loaded, 
+                r'./swagger_server/swagger_downloaded/converter-routine.yaml',
+                routing_request.CONVERTER_ROUTINE_SERVICE, 
+                routing_request.CONVERTER_ROUTINE_HOST, 
+                converter_api_setup[0],
+                converter_api_setup[1],
+            )
             conf_array.append(open("./swagger_server/swagger_downloaded/converter-routine.yaml", "r", encoding="utf-8").read())
         except:
             logging.error("Error executing fetch of converter host")
             traceback.print_exc()
             sys.exit()
-    if os.getenv('LOAD_RESOURCES_API') == "true" :
+    if resources_api_setup:
         try:
             item = urllib.request.urlopen(routing_request.RESOURCES_HOST+routing_request.RESOURCES_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
-            manipulate_and_generate_yaml(json_loaded, r'./swagger_server/swagger_downloaded/resources.yaml',routing_request.RESOURCES_SERVICE, routing_request.RESOURCES_HOST, False)
+            manipulate_and_generate_yaml(
+                json_loaded,
+                r'./swagger_server/swagger_downloaded/resources.yaml',
+                routing_request.RESOURCES_SERVICE,
+                routing_request.RESOURCES_HOST,
+                resources_api_setup[0],
+                resources_api_setup[1],
+            )
             conf_array.append(open("./swagger_server/swagger_downloaded/resources.yaml", "r", encoding="utf-8").read())
         except:
             logging.error("Error executing fetch of resource host")
             traceback.print_exc()
             sys.exit()
-    if os.getenv('LOAD_INGESTOR_API') == "true" :
+    if ingestor_api_setup:
         try:
             item = urllib.request.urlopen(routing_request.INGESTOR_HOST+routing_request.INGESTOR_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
-            manipulate_and_generate_yaml(json_loaded, r'./swagger_server/swagger_downloaded/ingestor.yaml',routing_request.INGESTOR_SERVICE, routing_request.INGESTOR_HOST, False)
+            manipulate_and_generate_yaml(
+                json_loaded, 
+                r'./swagger_server/swagger_downloaded/ingestor.yaml',
+                routing_request.INGESTOR_SERVICE, 
+                routing_request.INGESTOR_HOST, 
+                ingestor_api_setup[0],
+                ingestor_api_setup[1],
+            )
             conf_array.append(open("./swagger_server/swagger_downloaded/ingestor.yaml", "r", encoding="utf-8").read())
         except:
             logging.error("Error executing fetch of ingestor host")
             traceback.print_exc()
             sys.exit()
-    if os.getenv('LOAD_EXTERNAL_ACCESS_API') == "true" :
+    if external_api_setup:
         try:
             item = urllib.request.urlopen(routing_request.EXTERNAL_ACCESS_HOST+routing_request.EXTERNAL_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
-            manipulate_and_generate_yaml(json_loaded, r'./swagger_server/swagger_downloaded/external.yaml',routing_request.EXTERNAL_SERVICE, routing_request.EXTERNAL_ACCESS_HOST, False)
+            manipulate_and_generate_yaml(
+                json_loaded,
+                r'./swagger_server/swagger_downloaded/external.yaml',
+                routing_request.EXTERNAL_SERVICE,
+                routing_request.EXTERNAL_ACCESS_HOST,
+                external_api_setup[0],
+                external_api_setup[1],
+            )
             conf_array.append(open("./swagger_server/swagger_downloaded/external.yaml", "r", encoding="utf-8").read())
         except:
             logging.error("Error executing fetch of external access host")
             traceback.print_exc()
             sys.exit()
-    if os.getenv('LOAD_BACKOFFICE_API') == "true" :
+    if backoffice_api_setup:
         try:
             item = urllib.request.urlopen(routing_request.BACKOFFICE_HOST+routing_request.BACKOFFICE_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
-            manipulate_and_generate_yaml(json_loaded, r'./swagger_server/swagger_downloaded/backoffice.yaml',routing_request.BACKOFFICE_SERVICE, routing_request.BACKOFFICE_HOST, os.getenv('IS_AAI_ENABLED') == 'true')
+            manipulate_and_generate_yaml(
+                json_loaded, 
+                r'./swagger_server/swagger_downloaded/backoffice.yaml',
+                routing_request.BACKOFFICE_SERVICE, 
+                routing_request.BACKOFFICE_HOST, 
+                backoffice_api_setup[0],
+                backoffice_api_setup[1],
+            )
             conf_array.append(open("./swagger_server/swagger_downloaded/backoffice.yaml", "r", encoding="utf-8").read())
         except:
             logging.error("Error executing fetch of backoffice host")
             traceback.print_exc()
             sys.exit()
-    if os.getenv('LOAD_PROCESSING_API') == "true" :
+    if processing_api_setup:
         try:
             item = urllib.request.urlopen(routing_request.PROCESSING_ACCESS_HOST+routing_request.PROCESSING_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
-            manipulate_and_generate_yaml(json_loaded, r'./swagger_server/swagger_downloaded/processing.yaml',routing_request.PROCESSING_SERVICE, routing_request.PROCESSING_ACCESS_HOST, os.getenv('IS_AAI_ENABLED') == 'true')
+            manipulate_and_generate_yaml(
+                json_loaded,
+                r'./swagger_server/swagger_downloaded/processing.yaml',
+                routing_request.PROCESSING_SERVICE,
+                routing_request.PROCESSING_ACCESS_HOST,
+                processing_api_setup[0],
+                processing_api_setup[1],
+            )
             conf_array.append(open("./swagger_server/swagger_downloaded/processing.yaml", "r", encoding="utf-8").read())
         except:
             logging.error("Error executing fetch of processing host")
             traceback.print_exc()
             sys.exit()
-    if os.getenv('LOAD_EMAIL_SENDER_API') == "true" :
+    if email_sender_api_setup:
         try:
             item = urllib.request.urlopen(routing_request.EMAIL_SENDER_HOST+routing_request.EMAIL_SENDER_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
-            manipulate_and_generate_yaml(json_loaded, r'./swagger_server/swagger_downloaded/sender.yaml',routing_request.EMAIL_SENDER_SERVICE, routing_request.EMAIL_SENDER_HOST, os.getenv('IS_AAI_ENABLED') == 'true')
+            manipulate_and_generate_yaml(
+                json_loaded, 
+                r'./swagger_server/swagger_downloaded/sender.yaml',
+                routing_request.EMAIL_SENDER_SERVICE, 
+                routing_request.EMAIL_SENDER_HOST, 
+                email_sender_api_setup[0],
+                email_sender_api_setup[1],
+            )
             conf_array.append(open("./swagger_server/swagger_downloaded/sender.yaml", "r", encoding="utf-8").read())
         except:
-            logging.error("Error executing fetch of processing host")
+            logging.error("Error executing fetch of email sender host")
             traceback.print_exc()
             sys.exit()
-    if os.getenv('LOAD_SHARING_API') == "true" :
+    if sharing_api_setup:
         try:
             item = urllib.request.urlopen(routing_request.SHARING_HOST+routing_request.SHARING_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
-            manipulate_and_generate_yaml(json_loaded, r'./swagger_server/swagger_downloaded/sharing.yaml',routing_request.SHARING_SERVICE, routing_request.SHARING_HOST, os.getenv('IS_AAI_ENABLED') == 'false')
+            manipulate_and_generate_yaml(
+                json_loaded,
+                r'./swagger_server/swagger_downloaded/sharing.yaml',
+                routing_request.SHARING_SERVICE,
+                routing_request.SHARING_HOST,
+                sharing_api_setup[0],
+                sharing_api_setup[1],
+            )
             conf_array.append(open("./swagger_server/swagger_downloaded/sharing.yaml", "r", encoding="utf-8").read())
         except:
-            logging.error("Error executing fetch of processing host")
+            logging.error("Error executing fetch of sharing host")
             traceback.print_exc()
             sys.exit()
-
 
 
     # ADD Security component

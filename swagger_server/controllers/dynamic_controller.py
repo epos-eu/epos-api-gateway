@@ -11,8 +11,7 @@ from flask import Response, send_file, make_response, jsonify
 from swagger_server import util
 from swagger_server.controllers import routing_request
 
-def call_redirect(query, isauthrequest, server):
-
+def call_redirect(query, isauthrequest, server, only_admin: bool = False):
     query = query.decode("utf-8")
     query = urllib.parse.unquote(query)
 
@@ -31,6 +30,12 @@ def call_redirect(query, isauthrequest, server):
                     json_payload = json.loads(auth_response.response[0])
                     query += "&userId=" + json_payload['eduPersonUniqueId']
                     query += "&email=" + json_payload['email'] + "&firstName=" + json_payload['firstname'] + "&lastName=" + json_payload['lastName']
+
+                    if only_admin:
+                        isAdmin = routing_request.isAdmin(connexion.request.headers['Authorization'], query)
+                        if not isAdmin:
+                            return ("Only admins have access to this endpoint. You are not an admin.", 401, connexion.request.headers.items())
+
                 if "sender" in connexion.request.path:
                     json_payload = json.loads(auth_response.response[0])
                     query += "&userEmail=" + json_payload['email'] + "&firstName=" + json_payload['firstname'] + "&lastName=" + json_payload['lastName']
