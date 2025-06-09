@@ -9,7 +9,7 @@ from flask import Response, send_file, make_response, jsonify
 import jwt
 import os
 
-PREFIX = os.getenv('PREFIX')
+PREFIX = os.getenv('PREFIX', '')
 
 RESOURCES_HOST = 'http://'+PREFIX+'resources-service:8080'
 WORKSPACES_HOST = 'http://'+PREFIX+'workspace-service:8080'
