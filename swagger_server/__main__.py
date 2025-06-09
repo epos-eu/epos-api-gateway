@@ -3,17 +3,15 @@
 import connexion
 
 import logging
-import urllib
+from urllib import request
 import json
 import random
 import string
 import yaml
 import traceback
 import requests
-from json import JSONEncoder
 from flask_cors import CORS
 import sys
-from gevent.pywsgi import WSGIServer
 
 
 from swagger_server.controllers import routing_request
@@ -24,7 +22,6 @@ import os
 
 import hiyapyco
 
-from swagger_server import encoder
 from swagger_server.swagger_description import get_description, get_version, get_contact_email, get_api_title
 
 security_dict = yaml.safe_load('''
@@ -197,7 +194,7 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth: b
                 if isauth or ("monitoring" in key and monitoring_api_setup and monitoring_api_setup[0]):
                     json_loaded['paths'][key]['get'].update(security_dict)
             if 'options' in json_loaded['paths'][key]:
-                randomname = ''.join(random.choice(string.ascii_lowercase) for i in range(30))
+                randomname = ''.join(random.choice(string.ascii_lowercase) for _ in range(30))
                 if "monitoring" in key and monitoring_api_setup:
                     add_method_to_dynamic_controller(
                         randomname,
@@ -216,14 +213,14 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth: b
                 if isauth or ("monitoring" in key and monitoring_api_setup and monitoring_api_setup[0]):
                     json_loaded['paths'][key]['options'].update(security_dict)
             if 'post' in json_loaded['paths'][key]:
-                randomname = ''.join(random.choice(string.ascii_lowercase) for i in range(30))
+                randomname = ''.join(random.choice(string.ascii_lowercase) for _ in range(30))
                 add_method_to_dynamic_controller(randomname,host,service,isauth, only_admin)
                 json_loaded['paths'][key]['post']['operationId'] = randomname
                 json_loaded['paths'][key]['post']['x-openapi-router-controller'] = "swagger_server.controllers.dynamic_controller"
                 if isauth :
                     json_loaded['paths'][key]['post'].update(security_dict)
             if 'put' in json_loaded['paths'][key]:
-                randomname = ''.join(random.choice(string.ascii_lowercase) for i in range(30))
+                randomname = ''.join(random.choice(string.ascii_lowercase) for _ in range(30))
                 if 'put' in value and 'parameters' in value['put'] and isinstance(value['put']['parameters'],list) and len(value['put']['parameters']) > 0 and 'in' in value['put']['parameters'][0] and 'name' in value['put']['parameters'][0] and value['put']['parameters'][0]['in'] == 'path':
                     add_method_to_dynamic_controller(randomname, host, service, isauth, only_admin)
                 else:
@@ -233,7 +230,7 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth: b
                 if isauth :
                     json_loaded['paths'][key]['put'].update(security_dict)
             if 'delete' in json_loaded['paths'][key]:
-                randomname = ''.join(random.choice(string.ascii_lowercase) for i in range(30))
+                randomname = ''.join(random.choice(string.ascii_lowercase) for _ in range(30))
                 add_method_to_dynamic_controller(randomname,host,service,isauth, only_admin)
                 json_loaded['paths'][key]['delete']['operationId'] = randomname
                 json_loaded['paths'][key]['delete']['x-openapi-router-controller'] = "swagger_server.controllers.dynamic_controller"
@@ -251,7 +248,7 @@ def load_configuration():
 
     if converter_api_setup :
         try:
-            item = urllib.request.urlopen(routing_request.CONVERTER_HOST+routing_request.CONVERTER_SERVICE+"/api-docs")
+            item = request.urlopen(routing_request.CONVERTER_HOST+routing_request.CONVERTER_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
             manipulate_and_generate_yaml(
                 json_loaded,
@@ -267,7 +264,7 @@ def load_configuration():
             traceback.print_exc()
             sys.exit()
         try:
-            item = urllib.request.urlopen(routing_request.CONVERTER_ROUTINE_HOST+routing_request.CONVERTER_ROUTINE_SERVICE+"/api-docs")
+            item = request.urlopen(routing_request.CONVERTER_ROUTINE_HOST+routing_request.CONVERTER_ROUTINE_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
             manipulate_and_generate_yaml(
                 json_loaded, 
@@ -284,7 +281,7 @@ def load_configuration():
             sys.exit()
     if resources_api_setup:
         try:
-            item = urllib.request.urlopen(routing_request.RESOURCES_HOST+routing_request.RESOURCES_SERVICE+"/api-docs")
+            item = request.urlopen(routing_request.RESOURCES_HOST+routing_request.RESOURCES_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
             manipulate_and_generate_yaml(
                 json_loaded,
@@ -301,7 +298,7 @@ def load_configuration():
             sys.exit()
     if ingestor_api_setup:
         try:
-            item = urllib.request.urlopen(routing_request.INGESTOR_HOST+routing_request.INGESTOR_SERVICE+"/api-docs")
+            item = request.urlopen(routing_request.INGESTOR_HOST+routing_request.INGESTOR_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
             manipulate_and_generate_yaml(
                 json_loaded, 
@@ -318,7 +315,7 @@ def load_configuration():
             sys.exit()
     if external_api_setup:
         try:
-            item = urllib.request.urlopen(routing_request.EXTERNAL_ACCESS_HOST+routing_request.EXTERNAL_SERVICE+"/api-docs")
+            item = request.urlopen(routing_request.EXTERNAL_ACCESS_HOST+routing_request.EXTERNAL_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
             manipulate_and_generate_yaml(
                 json_loaded,
@@ -335,7 +332,7 @@ def load_configuration():
             sys.exit()
     if backoffice_api_setup:
         try:
-            item = urllib.request.urlopen(routing_request.BACKOFFICE_HOST+routing_request.BACKOFFICE_SERVICE+"/api-docs")
+            item = request.urlopen(routing_request.BACKOFFICE_HOST+routing_request.BACKOFFICE_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
             manipulate_and_generate_yaml(
                 json_loaded, 
@@ -352,7 +349,7 @@ def load_configuration():
             sys.exit()
     if processing_api_setup:
         try:
-            item = urllib.request.urlopen(routing_request.PROCESSING_ACCESS_HOST+routing_request.PROCESSING_SERVICE+"/api-docs")
+            item = request.urlopen(routing_request.PROCESSING_ACCESS_HOST+routing_request.PROCESSING_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
             manipulate_and_generate_yaml(
                 json_loaded,
@@ -369,7 +366,7 @@ def load_configuration():
             sys.exit()
     if email_sender_api_setup:
         try:
-            item = urllib.request.urlopen(routing_request.EMAIL_SENDER_HOST+routing_request.EMAIL_SENDER_SERVICE+"/api-docs")
+            item = request.urlopen(routing_request.EMAIL_SENDER_HOST+routing_request.EMAIL_SENDER_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
             manipulate_and_generate_yaml(
                 json_loaded, 
@@ -386,7 +383,7 @@ def load_configuration():
             sys.exit()
     if sharing_api_setup:
         try:
-            item = urllib.request.urlopen(routing_request.SHARING_HOST+routing_request.SHARING_SERVICE+"/api-docs")
+            item = request.urlopen(routing_request.SHARING_HOST+routing_request.SHARING_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
             manipulate_and_generate_yaml(
                 json_loaded,
@@ -493,7 +490,7 @@ def main():
     app.add_url_rule("/api/v1/data-metadata-service/health", "data_metadata_service_health", data_metadata_service_health)
     app.add_url_rule("/api/v1/processing-access-service/health", "processing_health", processing_health)
     app.add_url_rule("/api/v1/email-sender-service/health", "email_sender_health", email_sender_health)
-    path=os.getenv('BASECONTEXT')
+    path=os.getenv('BASECONTEXT', '')
     proxied = ReverseProxied(
         flask_app.wsgi_app,
         script_name=path
