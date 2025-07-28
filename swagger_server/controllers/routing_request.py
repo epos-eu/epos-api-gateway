@@ -36,7 +36,7 @@ CONVERTER_ROUTINE_SERVICE = "/api/converter-routine/v1"
 
 
 def authorizationCall(bearer_token):
-    auth_response = requests.get(os.getenv('AAI_SERVICE_ENDPOINT'), headers={'Authorization': bearer_token})
+    auth_response = requests.get(os.getenv("AAI_SERVICE_ENDPOINT", ""), headers={"Authorization": "Bearer " + bearer_token})
     return Response(auth_response.content, auth_response.status_code)
 
 def isAdmin(bearer_token: str, query: str) -> bool:

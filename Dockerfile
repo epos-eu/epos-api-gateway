@@ -1,4 +1,4 @@
-FROM python:3.12.0a7-slim-buster
+FROM python:3.12-slim
 
 ENV API_VERSION="1.0.0"
 ENV API_TITLE="API Gateway"
