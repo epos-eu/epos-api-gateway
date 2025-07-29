@@ -28,8 +28,8 @@ def call_redirect(query, isauthrequest, server, only_admin: bool = False):
             else:
                 if "monitoring" not in connexion.request.path:
                     json_payload = json.loads(auth_response.response[0])
-                    query += "&userId=" + json_payload['eduPersonUniqueId']
-                    query += "&email=" + json_payload['email'] + "&firstName=" + json_payload['firstname'] + "&lastName=" + json_payload['lastName']
+                    query += "&userId=" + json_payload['sub']
+                    query += "&email=" + json_payload['email'] + "&firstName=" + json_payload['given_name'] + "&lastName=" + json_payload['family_name']
 
                     if only_admin:
                         isAdmin = routing_request.isAdmin(connexion.request.headers['Authorization'], query)
@@ -40,7 +40,8 @@ def call_redirect(query, isauthrequest, server, only_admin: bool = False):
                     json_payload = json.loads(auth_response.response[0])
                     query += "&userEmail=" + json_payload['email'] + "&firstName=" + json_payload['firstname'] + "&lastName=" + json_payload['lastName']
 
-        except:
+        except Exception as e:
+            logging.error(f"Caught exception: {type(e).__name__}: {str(e)}")
             return ("No authentication token provided or error while checking it...", 401, connexion.request.headers.items())
     
     if "search" in connexion.request.path:
@@ -48,12 +49,12 @@ def call_redirect(query, isauthrequest, server, only_admin: bool = False):
             auth_response = ""
             auth_response = routing_request.authorizationCall(connexion.request.headers['Authorization'])
             if auth_response.status_code == 401 :
-                print("Wrong or expired auth token provided for search endpoints, skipping auth")
+                logging.warning("Wrong or expired auth token provided for search endpoints, skipping auth")
             else:
                 json_payload = json.loads(auth_response.response[0])
                 query += "&userId=" + json_payload['eduPersonUniqueId']
         except:
-            print("No auth token provided for search endpoints, skipping auth")
+            logging.warning("No auth token provided for search endpoints, skipping auth")
 
 
     return routing_request.routingrequest(server,
