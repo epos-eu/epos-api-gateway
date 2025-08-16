@@ -1,0 +1,87 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.Python
+
+# VS Code, PyCharm, and other IDE/editor settings
+.vscode/
+.idea/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+*.whl
+pip-wheel-metadata/
+
+# Logs and coverage
+*.log
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+.cache/
+.pytest_cache/
+nosetests.xml
+test-results/
+
+# MyPy, Pyre, etc.
+.mypy_cache/
+.pyre/
+.dmypy.json
+
+# Local config files
+.env
+.env.*
+*.env
+*.secret
+*.bak
+*.tmp
+
+# macOS, Windows, and Linux system files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+desktop.ini
+
+# Swagger/OpenAPI generated files
+.swagger_server/models/__pycache__/
+.swagger_server/controllers/__pycache__/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Ansible
+*.retry
+
+# Docker
+*.tar
+__docker_build__/
+docker-compose.override.yml
+
+# Editor swap/backup files
+*~
+*.swp
+*.swo
+*.orig
+*.bak
+
+# Others you might want to consider
+*.sqlite3
+*.db
+*.log
