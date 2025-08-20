@@ -248,7 +248,7 @@ def load_configuration():
 
     if converter_api_setup :
         try:
-            print(routing_request.CONVERTER_HOST)
+            logging.warning(routing_request.CONVERTER_HOST)
             item = request.urlopen(routing_request.CONVERTER_HOST+routing_request.CONVERTER_SERVICE+"/api-docs")
             json_loaded = json.loads(item.read())
             manipulate_and_generate_yaml(
