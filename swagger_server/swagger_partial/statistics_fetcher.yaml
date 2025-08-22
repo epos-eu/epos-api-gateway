@@ -1,0 +1,58 @@
+paths:
+  /statistics:
+    get:
+      description: fetches the statistics from the BRGM statistics service
+      tags:
+        - Statistcs
+      summary: GET statistics
+      operationId: statistics_fetcher
+      x-openapi-router-controller: swagger_server.statistics_fetcher
+      parameters:
+        - name: module
+          in: query
+          required: true
+          schema:
+            type: string
+          example: Proxy
+        - name: action
+          in: query
+          required: true
+          schema:
+            type: string
+          example: getUmdJs
+        - name: chunk
+          in: query
+          required: false
+          schema:
+            type: integer
+          example: 1
+        - name: cb
+          in: query
+          required: true
+          schema:
+            type: string
+          example: 5bb62a912c08e91ef2dd35477786698a
+      responses:
+        '200':
+          description: "Successfully Found "
+        '404':
+          description: "Couldn't find what you were looking for"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/main.HTTPError'
+        '500':
+          description: "Error in Server"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/main.HTTPError'
+
+components:
+  schemas:
+    main.HTTPError:
+      type: object
+      properties:
+        error:
+          type: string
+          example: can't connect to database
