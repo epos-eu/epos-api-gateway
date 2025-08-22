@@ -218,14 +218,13 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth: b
                     path = "/submit_feedback"
                     json_loaded['paths'][path]['post']['operationId'] = "submit_feedback"
                     json_loaded['paths'][path]['post']['x-openapi-router-controller'] = "swagger_server.controllers.feedback_controller"
-                    continue
-
-                randomname = ''.join(random.choice(string.ascii_lowercase) for _ in range(30))
-                add_method_to_dynamic_controller(randomname,host,service,isauth, only_admin)
-                json_loaded['paths'][key]['post']['operationId'] = randomname
-                json_loaded['paths'][key]['post']['x-openapi-router-controller'] = "swagger_server.controllers.dynamic_controller"
-                if isauth :
-                    json_loaded['paths'][key]['post'].update(security_dict)
+                else:
+                    randomname = ''.join(random.choice(string.ascii_lowercase) for _ in range(30))
+                    add_method_to_dynamic_controller(randomname,host,service,isauth, only_admin)
+                    json_loaded['paths'][key]['post']['operationId'] = randomname
+                    json_loaded['paths'][key]['post']['x-openapi-router-controller'] = "swagger_server.controllers.dynamic_controller"
+                    if isauth :
+                        json_loaded['paths'][key]['post'].update(security_dict)
             if 'put' in json_loaded['paths'][key]:
                 randomname = ''.join(random.choice(string.ascii_lowercase) for _ in range(30))
                 if 'put' in value and 'parameters' in value['put'] and isinstance(value['put']['parameters'],list) and len(value['put']['parameters']) > 0 and 'in' in value['put']['parameters'][0] and 'name' in value['put']['parameters'][0] and value['put']['parameters'][0]['in'] == 'path':
@@ -499,7 +498,6 @@ def main():
     app.add_api('swagger_built.yaml', arguments={'title': 'API Gateway'},validator_map=validator_map, pythonic_params=True)
     flask_app = app.app
     CORS(flask_app)
-    app.add_url_rule("/api/v1/submit_feedback", "submit_feedback", submit_feedback, methods=["POST"])
     app.add_url_rule("/api/v1/resources-service/health", "resources_health", resources_health)
     app.add_url_rule("/api/v1/ingestor-service/health", "ingestor_health", ingestor_health)
     app.add_url_rule("/api/v1/external-access-service/health", "exernal_access_health", exernal_access_health)
