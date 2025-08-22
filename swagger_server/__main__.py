@@ -13,7 +13,7 @@ import requests
 from flask_cors import CORS
 import sys
 
-
+from swagger_server.controllers.feedback_controller import submit_feedback
 from swagger_server.controllers import routing_request
 from connexion.decorators.response import ResponseValidator
 from swagger_server.custom_validators import CustomParameterValidator, CustomRequestBodyValidator
@@ -71,6 +71,7 @@ sharing_api_setup = getenv_split('LOAD_SHARING_API')
 converter_api_setup = getenv_split('LOAD_CONVERTER_API')
 monitoring_api_setup = getenv_split('LOAD_MONITORING_API')
 email_sender_api_setup = getenv_split('LOAD_EMAIL_SENDER_API')
+submit_feedback_api_setup = getenv_split('LOAD_SUBMIT_FEEDBACK_API')
 
 class ReverseProxied(object):
     '''Wrap the application in this middleware and configure the
@@ -213,6 +214,12 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth: b
                 if isauth or ("monitoring" in key and monitoring_api_setup and monitoring_api_setup[0]):
                     json_loaded['paths'][key]['options'].update(security_dict)
             if 'post' in json_loaded['paths'][key]:
+                if service == "/submit_feedback":
+                    path = "/submit_feedback"
+                    json_loaded['paths'][path]['post']['operationId'] = "submit_feedback"
+                    json_loaded['paths'][path]['post']['x-openapi-router-controller'] = "swagger_server.controllers.feedback_controller"
+                    continue
+
                 randomname = ''.join(random.choice(string.ascii_lowercase) for _ in range(30))
                 add_method_to_dynamic_controller(randomname,host,service,isauth, only_admin)
                 json_loaded['paths'][key]['post']['operationId'] = randomname
@@ -399,6 +406,16 @@ def load_configuration():
             traceback.print_exc()
             sys.exit()
 
+    
+    try:
+            
+        conf_array.append(open("./swagger_server/swagger_partial/feedback_services.yaml", "r", encoding="utf-8").read())
+    except:
+            logging.error("Error executing fetch of feedback host")
+            traceback.print_exc()
+            sys.exit()
+
+
 
     # ADD Security component
     conf_array.append(open("./swagger_server/swagger_partial/security_component.yaml", "r", encoding="utf-8").read())
@@ -482,6 +499,7 @@ def main():
     app.add_api('swagger_built.yaml', arguments={'title': 'API Gateway'},validator_map=validator_map, pythonic_params=True)
     flask_app = app.app
     CORS(flask_app)
+    app.add_url_rule("/api/v1/submit_feedback", "submit_feedback", submit_feedback, methods=["POST"])
     app.add_url_rule("/api/v1/resources-service/health", "resources_health", resources_health)
     app.add_url_rule("/api/v1/ingestor-service/health", "ingestor_health", ingestor_health)
     app.add_url_rule("/api/v1/external-access-service/health", "exernal_access_health", exernal_access_health)
