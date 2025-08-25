@@ -1,58 +1,79 @@
 paths:
   /statistics:
     get:
-      description: fetches the statistics from the BRGM statistics service
+      description: Fetches the statistics from the BRGM statistics service
       tags:
-        - Statistcs
+        - Statistics
       summary: GET statistics
       operationId: statistics_fetcher
       x-openapi-router-controller: swagger_server.statistics_fetcher
       parameters:
         - name: module
           in: query
-          required: true
+          required: false
           schema:
             type: string
-          example: Proxy
+          example: Widgetize
         - name: action
           in: query
-          required: true
+          required: false
           schema:
             type: string
-          example: getUmdJs
-        - name: chunk
+          example: iframe
+        - name: disableLink
           in: query
           required: false
           schema:
             type: integer
           example: 1
-        - name: cb
+        - name: widget
           in: query
-          required: true
+          required: false
+          schema:
+            type: integer
+          example: 1
+        - name: moduleToWidgetize
+          in: query
+          required: false
           schema:
             type: string
-          example: 5bb62a912c08e91ef2dd35477786698a
+          example: UserCountryMap
+        - name: actionToWidgetize
+          in: query
+          required: false
+          schema:
+            type: string
+          example: visitorMap
+        - name: idSite
+          in: query
+          required: false
+          schema:
+            type: integer
+          example: 233
+        - name: period
+          in: query
+          required: false
+          schema:
+            type: string
+          example: range
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+          example: 2019-01-1,today
+        - name: language
+          in: query
+          required: false
+          schema:
+            type: string
+          example: en
+        - name: enableDatePicker
+          in: query
+          required: false
+          schema:
+            type: integer
+          example: 1
       responses:
         '200':
-          description: "Successfully Found "
-        '404':
-          description: "Couldn't find what you were looking for"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/main.HTTPError'
-        '500':
-          description: "Error in Server"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/main.HTTPError'
-
-components:
-  schemas:
-    main.HTTPError:
-      type: object
-      properties:
-        error:
-          type: string
-          example: can't connect to database
+          description: Successfully Found
