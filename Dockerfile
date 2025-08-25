@@ -19,6 +19,7 @@ RUN opentelemetry-bootstrap -a install
 
 COPY . /usr/src/app
 
+
 RUN mkdir ./swagger_server/swagger_downloaded
 RUN mkdir ./swagger_server/swagger_generated
 
