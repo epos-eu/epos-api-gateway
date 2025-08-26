@@ -1,0 +1,6 @@
+venv
+.git
+.ruff_cache
+.github
+swagger_server/__pycache__
+swagger_server/*/__pycache__
