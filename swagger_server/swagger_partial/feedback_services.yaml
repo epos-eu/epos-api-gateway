@@ -21,7 +21,7 @@ paths:
                 description:
                   type: string
                   description: Info about the sender, and detailed information about the problem
-                  example: "name: alessandro \naffiliation:ingv \nemail:example@example.com \nmessage:Button not working"
+                  example: "name: example \naffiliation:example \nemail:example@example.com \nmessage: Example Button not working"
                 labels:
                   type: string
                   items:

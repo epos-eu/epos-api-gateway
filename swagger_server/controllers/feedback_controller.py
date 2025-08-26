@@ -13,7 +13,7 @@ def submit_feedback():
 
         # Validate environment variables
         if not feedback_destination:
-            logger.error("FEEDBACK_DESTINATION_URL enviroment variable is not set")
+            logger.error("FEEDBACK_DESTINATION_URL environment variable is not set")
             return Response('{"error": "Feedback service not configured, "}', status=500, content_type='application/json')
         
         if not feedback_token:
