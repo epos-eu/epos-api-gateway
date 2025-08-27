@@ -1,0 +1,76 @@
+paths:
+  /submit_feedback:
+    post:
+      description: Submit feedback as a GitLab issue with title, description, and labels
+      tags:
+        - Feedback
+      summary: Submit feedback to GitLab
+      operationId: submit_feedback
+      x-openapi-router-controller: swagger_server.controllers.feedback_controller
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Title of the issue/feedback
+                  example: "Bug Report: Botton not working"
+                description:
+                  type: string
+                  description: Info about the sender, and detailed information about the problem
+                  example: "name: example \naffiliation:example \nemail:example@example.com \nmessage: Example Button not working"
+                labels:
+                  type: string
+                  items:
+                    type: string
+                  description: Labels for categorizing the issue
+                  example: "Triage, Bugreport"
+              required:
+                - title
+                - description
+      responses:
+        '201':
+          description: Feedback submitted successfully
+        
+                
+        '400':
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/main.HTTPError'
+        '500':
+          description: Error submitting feedback to GitLab
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/main.HTTPError'
+
+components:
+  schemas:
+    main.HTTPError:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Missing required parameter: title"
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          

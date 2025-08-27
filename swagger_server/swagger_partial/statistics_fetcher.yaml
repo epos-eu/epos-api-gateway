@@ -1,0 +1,100 @@
+paths:
+  /statistics:
+    get:
+      description: Fetches the statistics from the BRGM statistics service
+      tags:
+        - Statistics
+      summary: GET statistics
+      operationId: statistics_fetcher
+      x-openapi-router-controller: swagger_server.statistics_fetcher
+      parameters:
+        - name: module
+          in: query
+          required: false
+          schema:
+            type: string
+          example: Widgetize
+        - name: action
+          in: query
+          required: false
+          schema:
+            type: string
+          example: iframe
+        - name: disableLink
+          in: query
+          required: false
+          schema:
+            type: integer
+          example: 1
+        - name: widget
+          in: query
+          required: false
+          schema:
+            type: integer
+          example: 1
+        - name: moduleToWidgetize
+          in: query
+          required: false
+          schema:
+            type: string
+          example: UserCountryMap
+        - name: actionToWidgetize
+          in: query
+          required: false
+          schema:
+            type: string
+          example: visitorMap
+        - name: idSite
+          in: query
+          required: false
+          schema:
+            type: integer
+          example: 233
+        - name: period
+          in: query
+          required: false
+          schema:
+            type: string
+          example: range
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+          example: 2019-01-1,today
+        - name: language
+          in: query
+          required: false
+          schema:
+            type: string
+          example: en
+        - name: enableDatePicker
+          in: query
+          required: false
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Successfully Found
+  /scientific_example:
+    get:
+      summary: Get a scientific example file from GitLab
+      description: Fetches a scientific example JSON file from the GitLab repository.
+      operationId: scientific_example_fetcher
+      x-openapi-router-controller: swagger_server.statistics_fetcher
+      tags:
+        - Scientific Examples
+      responses:
+        '200':
+          description: Scientific example retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Missing or invalid parameters
+        '404':
+          description: File not found
+        '500':
+          description: Server error
