@@ -88,13 +88,13 @@ paths:
       parameters:
         - name: project_id
           in: query
-          required: true
+          required: false
           schema:
             type: integer
           example: 219
         - name: file_path
           in: query
-          required: true
+          required: false
           schema:
             type: string
           example: scientific-examples/Scientific_Examples.JSON

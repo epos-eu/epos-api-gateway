@@ -180,7 +180,7 @@ def manipulate_and_generate_yaml(json_loaded, filename, service, host, isauth: b
                     path = "/scientific_example"
                     json_loaded['paths'][key]['get']['operationId'] = "scientific_example_fetcher"
                     json_loaded['paths'][key]['get']['x-openapi-router-controller'] = "swagger_server.statistics_fetcher"
-                if service == "/statistics":
+                elif service == "/statistics":
                     path = "/statistics"
                     json_loaded['paths'][key]['get']['operationId'] = "statistics_fetcher"
                     json_loaded['paths'][key]['get']['x-openapi-router-controller'] = "swagger_server.statistics_fetcher"
