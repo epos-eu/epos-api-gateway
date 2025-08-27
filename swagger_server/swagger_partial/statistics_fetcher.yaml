@@ -77,3 +77,43 @@ paths:
       responses:
         '200':
           description: Successfully Found
+  /scientific_example:
+    get:
+      summary: Get a scientific example file from GitLab
+      description: Fetches a scientific example JSON file from the GitLab repository.
+      operationId: scientific_example_fetcher
+      x-openapi-router-controller: swagger_server.statistics_fetcher
+      tags:
+        - Scientific Examples
+      parameters:
+        - name: project_id
+          in: query
+          required: true
+          schema:
+            type: integer
+          example: 219
+        - name: file_path
+          in: query
+          required: true
+          schema:
+            type: string
+          example: scientific-examples/Scientific_Examples.JSON
+        - name: ref
+          in: query
+          required: false
+          schema:
+            type: string
+          example: main
+      responses:
+        '200':
+          description: Scientific example retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Missing or invalid parameters
+        '404':
+          description: File not found
+        '500':
+          description: Server error
