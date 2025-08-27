@@ -85,25 +85,6 @@ paths:
       x-openapi-router-controller: swagger_server.statistics_fetcher
       tags:
         - Scientific Examples
-      parameters:
-        - name: project_id
-          in: query
-          required: false
-          schema:
-            type: integer
-          example: 219
-        - name: file_path
-          in: query
-          required: false
-          schema:
-            type: string
-          example: scientific-examples/Scientific_Examples.JSON
-        - name: ref
-          in: query
-          required: false
-          schema:
-            type: string
-          example: main
       responses:
         '200':
           description: Scientific example retrieved successfully
