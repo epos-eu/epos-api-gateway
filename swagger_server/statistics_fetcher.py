@@ -1,3 +1,4 @@
+import logging
 import requests
 from flask import request, Response
 import os
@@ -13,6 +14,7 @@ def statistics_fetcher():
     
     # build full url
     full_url = f"{statistic_base_url}?{query_string}&token_auth={statistic_token}"
+    logging.info(f"stats url: {full_url}")
     
     try:
         # Forward the request to BRGM
