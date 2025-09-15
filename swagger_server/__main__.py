@@ -411,23 +411,21 @@ def load_configuration():
             traceback.print_exc()
             sys.exit()
 
-   # adds the feedback_services partial to the list of yamls to be merged 
-    try:
-            
-        conf_array.append(open("./swagger_server/swagger_partial/feedback_services.yaml", "r", encoding="utf-8").read())
-    except:
-            logging.error("Error executing fetch of feedback yaml")
-            traceback.print_exc()
-            sys.exit()
-    # adds the scientific example partial to the list of yamls to be merged
-    try:   
-        conf_array.append(open("./swagger_server/swagger_partial/scientific_example.yaml", "r", encoding="utf-8").read())
-    except:
-            logging.error("Error executing fetch of statistcs yaml")
-            traceback.print_exc()
-            sys.exit()
+    if submit_feedback_api_setup:
+        try:
+            conf_array.append(open("./swagger_server/swagger_partial/feedback_services.yaml", "r", encoding="utf-8").read())
+        except:
+                logging.error("Error executing fetch of feedback yaml")
+                traceback.print_exc()
+                sys.exit()
 
-
+    if os.getenv("SCIENTIFIC_TOKEN"):
+        try:   
+            conf_array.append(open("./swagger_server/swagger_partial/scientific_example.yaml", "r", encoding="utf-8").read())
+        except:
+                logging.error("Error executing fetch of statistcs yaml")
+                traceback.print_exc()
+                sys.exit()
 
     # ADD Security component
     conf_array.append(open("./swagger_server/swagger_partial/security_component.yaml", "r", encoding="utf-8").read())
