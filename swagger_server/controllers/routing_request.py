@@ -11,21 +11,18 @@ import os
 
 PREFIX = os.getenv('PREFIX', '')
 
-RESOURCES_HOST = 'http://'+PREFIX+'resources-service:8080'
-WORKSPACES_HOST = 'http://'+PREFIX+'workspace-service:8080'
-EXTERNAL_ACCESS_HOST = 'http://'+PREFIX+'external-access-service:8080'
-INGESTOR_HOST = 'http://'+PREFIX+'ingestor-service:8080'
-BACKOFFICE_HOST = 'http://'+PREFIX+'backoffice-service:8080'
-CONVERTER_HOST = 'http://'+PREFIX+'converter-service:8080'
-CONVERTER_ROUTINE_HOST = 'http://'+PREFIX+'converter-routine:8080'
-DATA_METADATA_HOST = 'http://'+PREFIX+'data-metadata-service:8080'
-PROCESSING_ACCESS_HOST = 'http://'+PREFIX+'distributed-processing-service:8080'
-EMAIL_SENDER_HOST = 'http://'+PREFIX+'email-sender-service:8080'
-SHARING_HOST = 'http://'+PREFIX+'sharing-service:8080'
+RESOURCES_HOST = 'http://'+PREFIX+'resources'+os.getenv('SPLITTER', '-')+'service:8080'
+EXTERNAL_ACCESS_HOST = 'http://'+PREFIX+'external'+os.getenv('SPLITTER', '-')+'access'+os.getenv('SPLITTER', '-')+'service:8080'
+INGESTOR_HOST = 'http://'+PREFIX+'ingestor'+os.getenv('SPLITTER', '-')+'service:8080'
+BACKOFFICE_HOST = 'http://'+PREFIX+'backoffice'+os.getenv('SPLITTER', '-')+'service:8080'
+CONVERTER_HOST = 'http://'+PREFIX+'converter'+os.getenv('SPLITTER', '-')+'service:8080'
+CONVERTER_ROUTINE_HOST = 'http://'+PREFIX+'converter'+os.getenv('SPLITTER', '-')+'routine:8080'
+PROCESSING_ACCESS_HOST = 'http://'+PREFIX+'distributed'+os.getenv('SPLITTER', '-')+'processing'+os.getenv('SPLITTER', '-')+'service:8080'
+EMAIL_SENDER_HOST = 'http://'+PREFIX+'email'+os.getenv('SPLITTER', '-')+'sender'+os.getenv('SPLITTER', '-')+'service:8080'
+SHARING_HOST = 'http://'+PREFIX+'sharing'+os.getenv('SPLITTER', '-')+'service:8080'
 
 RESOURCES_SERVICE = "/api/resources-service/v1"
 EXTERNAL_SERVICE = "/api/external-access-service/v1"
-WORKSPACE_SERVICE = "/api/workspaces-service/v1"
 INGESTOR_SERVICE = "/api/ingestor-service/v1"
 BACKOFFICE_SERVICE = "/api/backoffice-service/v1"
 PROCESSING_SERVICE = "/api/distributed-processing-service/v1"
