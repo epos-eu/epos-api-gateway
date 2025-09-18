@@ -52,9 +52,9 @@ def call_redirect(query, isauthrequest, server, only_admin: bool = False):
                 logging.warning("Wrong or expired auth token provided for search endpoints, skipping auth")
             else:
                 json_payload = json.loads(auth_response.response[0])
-                query += "&userId=" + json_payload['eduPersonUniqueId']
-        except:
-            logging.warning("No auth token provided for search endpoints, skipping auth")
+                query += "&userId=" + json_payload['sub']
+        except Exception as e:
+            logging.warning(f"No auth token provided for search endpoints, skipping auth: {e}")
 
 
     return routing_request.routingrequest(server,
