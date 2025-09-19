@@ -37,9 +37,6 @@ RUN python3 -m pip install --no-cache-dir --upgrade pip \
 
 COPY --chown=1001:1001 . /usr/src/app
 
-RUN mkdir ./swagger_server/swagger_downloaded
-RUN mkdir ./swagger_server/swagger_generated
-
 EXPOSE 5000
 
 USER 1001
