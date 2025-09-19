@@ -126,7 +126,7 @@ def remove_key(d, key):
     d.pop(key)
 
 def add_method_to_dynamic_controller(randomname, host, service, isauth, only_admin: bool = False) :
-    method_string = "\ndef "+randomname+"(meta_id=None, instance_id=None, plugin_id=None, relation_id=None):"
+    method_string = "\ndef "+randomname+"(meta_id=None, instance_id=None, plugin_id=None, relation_id=None, uid=None):"
     method_string+= "\n    server = '"+host+service+"'+connexion.request.base_url.split('/api/v1')[1]"
     if isauth:
         if only_admin:
