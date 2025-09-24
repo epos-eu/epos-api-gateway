@@ -58,7 +58,6 @@ def authorizationJWT(bearer_token):
         return Response("TOKEN NOT VALID", 401)
 
 def routingrequest(server, method, headers, query, body, request):
-
     logging.warning('Executing the actual request with the following parameters: ')
     logging.warning('[server]:\n'+str(server)+'\n')
     logging.warning('[method]:\n'+str(method)+'\n')
@@ -87,12 +86,12 @@ def routingrequest(server, method, headers, query, body, request):
         if request.is_json:
             resp = requests.post(f'{server}?{query}', json=request.json, headers=headers, allow_redirects=False)
         else:
-            resp = requests.post(f'{server}?{query}', json=body, headers=headers, allow_redirects=False)
+            resp = requests.post(f'{server}?{query}', data=body, headers=headers, allow_redirects=False)
     if method == 'PUT' :
         if request.is_json:
             resp = requests.put(f'{server}?{query}', json=request.json, headers=headers, allow_redirects=False)
         else:
-            resp = requests.put(f'{server}?{query}', json=body, headers=headers, allow_redirects=False)
+            resp = requests.put(f'{server}?{query}', data=body, headers=headers, allow_redirects=False)
     if method == 'DELETE' :
         resp = requests.delete(f'{server}?{query}', data=body, headers=headers, allow_redirects=False)
 

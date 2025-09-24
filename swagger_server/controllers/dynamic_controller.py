@@ -60,7 +60,7 @@ def call_redirect(query, isauthrequest, server, only_admin: bool = False):
                             connexion.request.method, 
                             connexion.request.headers, 
                             query,
-                            connexion.request.form,
+                            connexion.request.get_data(),
                             connexion.request)
 
 def tcsconnections_ogc_execute_get_using_get(instance_id=None):  # noqa: E501
